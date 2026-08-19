@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Poppins", var(--font-sans);
+
+  --color-primary: #169B62;
+  --color-primary-dark: #0E6D45;
+  --color-primary-light: #C8EAD6;
+  --color-charcoal: #111111;
+  --color-dark-gray: #333333;
+  --color-medium-gray: #E5E5E5;
+  --color-light-gray: #F5F5F5;
+  --color-sage: #7BAE8F;
+  --color-taupe: #A69F94;
+  --color-warm-gray: #D9D6D1;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.10);
+  --shadow-xl: 0 20px 50px rgba(0,0,0,0.15);
+
+  --text-h1: 4rem; /* 64px */
+  --text-h1--line-height: 4.5rem; /* 72px */
+  --text-h2: 2.5rem; /* 40px */
+  --text-h2--line-height: 3rem; /* 48px */
+  --text-h3: 1.75rem; /* 28px */
+  --text-h3--line-height: 2.25rem; /* 36px */
+  --text-h4: 1.375rem; /* 22px */
+  --text-h4--line-height: 1.875rem; /* 30px */
+  --text-h5: 1.125rem; /* 18px */
+  --text-h5--line-height: 1.625rem; /* 26px */
+  --text-h6: 1rem; /* 16px */
+  --text-h6--line-height: 1.5rem; /* 24px */
+  --text-body1: 1rem; /* 16px */
+  --text-body1--line-height: 1.625rem; /* 26px */
+  --text-body2: 0.875rem; /* 14px */
+  --text-body2--line-height: 1.375rem; /* 22px */
+  --text-caption: 0.75rem; /* 12px */
+  --text-caption--line-height: 1.125rem; /* 18px */
+
+  --radius-button: 8px;
+  --radius-card: 16px;
+}
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #111111;
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    @apply font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-charcoal;
+  }
+
+  h1 {
+    @apply text-h2 font-semibold md:text-h1;
+  }
+  h2 {
+    @apply text-h3 font-semibold md:text-h2;
+  }
+  h3 {
+    @apply text-h3 font-medium;
+  }
+  h4 {
+    @apply text-h4 font-medium;
+  }
+  h5 {
+    @apply text-h5 font-medium;
+  }
+  h6 {
+    @apply text-h6 font-semibold;
+  }
+  p {
+    @apply text-body1 text-dark-gray;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
+@layer utilities {
+  .fade-divider-dark {
+    position: relative;
+  }
+  .fade-divider-dark::after {
+    content: "";
+    position: absolute;
+    top: 15%;
+    bottom: 15%;
+    right: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.25), transparent);
+  }
+  .fade-divider-light {
+    position: relative;
+  }
+  .fade-divider-light::after {
+    content: "";
+    position: absolute;
+    top: 15%;
+    bottom: 15%;
+    right: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.25), transparent);
+  }
+}
