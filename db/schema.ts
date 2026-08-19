@@ -155,4 +155,34 @@ export const jobPostings = pgTable("job_postings", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+export const bankAccounts = pgTable("bank_accounts", {
+  id: text("id").primaryKey(),
+  bankName: text("bank_name").notNull(), // e.g., Meezan Bank
+  accountTitle: text("account_title").notNull(), // e.g., Fanoon Consultants
+  accountNumber: text("account_number").notNull(),
+  iban: text("iban"),
+  branchCode: text("branch_code"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const invoices = pgTable("invoices", {
+  id: text("id").primaryKey(),
+  invoiceNumber: text("invoice_number").notNull().unique(), // e.g., INV-1001
+  clientName: text("client_name").notNull(),
+  clientEmail: text("client_email"),
+  clientPhone: text("client_phone"),
+  projectName: text("project_name"),
+  description: text("description").notNull(),
+  amount: integer("amount").notNull(), // in PKR (whole numbers)
+  dueDate: timestamp("due_date").notNull(),
+  bankAccountId: text("bank_account_id").notNull().references(() => bankAccounts.id),
+  status: text("status").default("pending"), // pending, processing, paid, cancelled
+  paymentProofUrl: text("payment_proof_url"), // Cloudinary URL
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 

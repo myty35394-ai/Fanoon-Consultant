@@ -10,7 +10,9 @@ export default function Footer() {
   const pathname = usePathname();
   const currentYear = new Date().getFullYear();
 
-  if (pathname?.startsWith("/admin")) return null;
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/invoice")) {
+    return null;
+  }
 
   return (
     <footer className="bg-charcoal text-white pt-16 pb-8 border-t border-dark-gray mt-auto">

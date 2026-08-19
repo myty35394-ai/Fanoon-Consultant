@@ -41,8 +41,10 @@ export default function Navbar() {
     };
   }, [isMobileMenuOpen]);
 
-  // Hide Navbar on admin pages
-  if (pathname.startsWith("/admin")) return null;
+  // Do not render navbar on admin or invoice pages
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/invoice")) {
+    return null;
+  }
 
   const navLinks = [
     { name: "Home", href: "/" },

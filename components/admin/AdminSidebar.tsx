@@ -14,6 +14,8 @@ import {
   FileText,
   Briefcase,
   UserCheck,
+  Building,
+  Receipt,
 } from "lucide-react";
 import { signOut } from "@/lib/auth-client";
 
@@ -24,6 +26,8 @@ export default function AdminSidebar() {
     { name: "Overview",     href: "/admin",              icon: LayoutDashboard },
     { name: "Inquiries",    href: "/admin/inquiries",    icon: Inbox },
     { name: "Projects",     href: "/admin/projects",     icon: FolderKanban },
+    { name: "Invoices",     href: "/admin/invoices",     icon: Receipt },
+    { name: "Banks",        href: "/admin/banks",        icon: Building },
     { name: "Job Postings", href: "/admin/jobs",         icon: Briefcase },
     { name: "Applications", href: "/admin/applications", icon: UserCheck },
     { name: "Blog Posts",   href: "/admin/blog",         icon: FileText },
