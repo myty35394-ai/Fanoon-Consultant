@@ -62,33 +62,39 @@ export default async function Home() {
   const services = [
     {
       title: "Architecture Design",
+      slug: "architecture-design",
       description: "Creative and functional architectural design solutions tailored to your vision and context.",
-      icon: <Building2 className="w-8 h-8 text-charcoal" strokeWidth={1.2} />,
+      icon: <Building2 className="w-8 h-8 text-charcoal group-hover:text-primary transition-colors" strokeWidth={1.2} />,
     },
     {
       title: "Interior Design",
+      slug: "interior-design",
       description: "Elegant and practical interior spaces that reflect your style and enhance everyday living.",
-      icon: <Sofa className="w-8 h-8 text-charcoal" strokeWidth={1.2} />,
+      icon: <Sofa className="w-8 h-8 text-charcoal group-hover:text-primary transition-colors" strokeWidth={1.2} />,
     },
     {
       title: "Landscape Design",
+      slug: "landscape-design",
       description: "Sustainable and innovative landscape designs that connect nature with architecture.",
-      icon: <Trees className="w-8 h-8 text-charcoal" strokeWidth={1.2} />,
+      icon: <Trees className="w-8 h-8 text-charcoal group-hover:text-primary transition-colors" strokeWidth={1.2} />,
     },
     {
       title: "3D Visualization",
+      slug: "3d-visualization",
       description: "High-quality 3D renders and walkthroughs that bring your project to life before it's built.",
-      icon: <Box className="w-8 h-8 text-charcoal" strokeWidth={1.2} />,
+      icon: <Box className="w-8 h-8 text-charcoal group-hover:text-primary transition-colors" strokeWidth={1.2} />,
     },
     {
       title: "Project Management",
+      slug: "project-management",
       description: "Efficient planning, coordination and management to ensure on-time, on-budget delivery.",
-      icon: <ClipboardList className="w-8 h-8 text-charcoal" strokeWidth={1.2} />,
+      icon: <ClipboardList className="w-8 h-8 text-charcoal group-hover:text-primary transition-colors" strokeWidth={1.2} />,
     },
     {
       title: "Construction Supervision",
+      slug: "construction-supervision",
       description: "Professional site supervision ensuring quality, safety and compliance at every stage.",
-      icon: <HardHat className="w-8 h-8 text-charcoal" strokeWidth={1.2} />,
+      icon: <HardHat className="w-8 h-8 text-charcoal group-hover:text-primary transition-colors" strokeWidth={1.2} />,
     },
   ];
 
@@ -190,25 +196,29 @@ export default async function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
             {services.map((service) => (
-              <div 
+              <Link 
                 key={service.title} 
-                className="bg-white px-4 py-10 shadow-sm hover:shadow-md transition-shadow duration-300 text-center flex flex-col items-center"
+                href={`/services/${service.slug}`}
+                className="bg-white px-4 py-10 shadow-sm hover:shadow-lg transition-all duration-300 text-center flex flex-col items-center group hover:-translate-y-1 block cursor-pointer border border-transparent hover:border-primary/30 rounded-sm"
               >
                 <div className="relative w-20 h-20 flex items-center justify-center mb-6">
                   {/* Imperfect sketchy green ring */}
-                  <svg className="absolute inset-0 w-full h-full text-primary opacity-80" viewBox="0 0 100 100">
+                  <svg className="absolute inset-0 w-full h-full text-primary opacity-80 group-hover:scale-105 transition-transform" viewBox="0 0 100 100">
                     <path d="M 50 8 C 75 8, 92 25, 92 50 C 92 72, 78 92, 50 92 C 28 92, 8 75, 8 50 C 8 25, 25 8, 50 8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="16 6 8 4 20 6" strokeLinecap="round" className="-rotate-12 origin-center" />
                     <path d="M 45 10 C 60 8, 85 15, 90 40" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="4 8" opacity="0.5" />
                   </svg>
                   {service.icon}
                 </div>
-                <h6 className="uppercase text-[12px] font-bold tracking-wider leading-tight mb-4 text-charcoal h-8 flex flex-col items-center justify-center">
+                <h6 className="uppercase text-[12px] font-bold tracking-wider leading-tight mb-4 text-charcoal group-hover:text-primary transition-colors h-8 flex flex-col items-center justify-center">
                   {service.title.split(' ').map((word, i) => (
                     <span key={i}>{word}</span>
                   ))}
                 </h6>
                 <p className="text-[12px] leading-relaxed text-dark-gray opacity-80 px-1">{service.description}</p>
-              </div>
+                <span className="mt-4 text-[11px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                  Learn More <ArrowRight className="w-3 h-3" />
+                </span>
+              </Link>
             ))}
           </div>
         </div>
@@ -306,7 +316,7 @@ export default async function Home() {
           />
 
           <div className="text-center flex justify-center mt-8">
-            <Link href="/services" className="flex justify-center items-center text-[12px] font-bold text-white tracking-widest uppercase border border-primary/50 bg-transparent hover:bg-primary/20 transition-colors duration-300 px-8 py-3.5 rounded-sm">
+            <Link href="/our-process" className="flex justify-center items-center text-[12px] font-bold text-white tracking-widest uppercase border border-primary/50 bg-transparent hover:bg-primary/20 transition-colors duration-300 px-8 py-3.5 rounded-sm">
               EXPLORE OUR PROCESS
               <ArrowRight className="ml-4 w-4 h-4" />
             </Link>

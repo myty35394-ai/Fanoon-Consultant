@@ -29,7 +29,7 @@ const services = [
     icon: <Building2 />,
     imageUrl:
       "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80",
-    href: "/services#architecture-design",
+    href: "/services/architecture-design",
   },
   {
     index: 2,
@@ -39,7 +39,7 @@ const services = [
     icon: <Sofa />,
     imageUrl:
       "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80",
-    href: "/services#interior-design",
+    href: "/services/interior-design",
   },
   {
     index: 3,
@@ -49,7 +49,7 @@ const services = [
     icon: <Trees />,
     imageUrl:
       "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-    href: "/services#landscape-design",
+    href: "/services/landscape-design",
   },
   {
     index: 4,
@@ -59,7 +59,7 @@ const services = [
     icon: <Box />,
     imageUrl:
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
-    href: "/services#3d-visualization",
+    href: "/services/3d-visualization",
   },
   {
     index: 5,
@@ -69,7 +69,7 @@ const services = [
     icon: <ClipboardList />,
     imageUrl:
       "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&q=80",
-    href: "/services#project-management",
+    href: "/services/project-management",
   },
   {
     index: 6,
@@ -79,7 +79,7 @@ const services = [
     icon: <HardHat />,
     imageUrl:
       "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80",
-    href: "/services#construction-supervision",
+    href: "/services/construction-supervision",
   },
 ];
 
