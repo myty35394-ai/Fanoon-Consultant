@@ -19,7 +19,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { title, category, client, location, year, coverImage, description, featured } = body;
+    const { title, category, client, location, year, coverImage, description, featured, isArsalan } = body;
 
     if (!title || !category || !coverImage) {
       return NextResponse.json(
@@ -46,6 +46,7 @@ export async function POST(req: Request) {
         coverImage,
         description: description || null,
         featured: Boolean(featured),
+        isArsalan: Boolean(isArsalan),
       })
       .returning();
 

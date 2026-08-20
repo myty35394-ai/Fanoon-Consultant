@@ -4,6 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Building2, Leaf, Lightbulb, Users } from "lucide-react";
 import Breadcrumb from "@/components/ui/Breadcrumb";
+import { db } from "@/db";
+import { projects } from "@/db/schema";
+import { eq, sql } from "drizzle-orm";
+
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Ar. Arsalan Haider | Founder & Principal Architect | Fanoon Consultants",
@@ -50,30 +55,59 @@ const journey = [
   },
 ];
 
-const portfolioItems = [
+const portfolioFallback = [
   {
     title: "Cantt Heights",
     category: "Mixed-use Development",
     image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80",
+    href: "/about-us/our-leadership/portfolio",
   },
   {
     title: "Green Heights",
     category: "Mixed-use Development",
     image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80",
+    href: "/about-us/our-leadership/portfolio",
   },
   {
     title: "Peshawar Cantonment",
     category: "Beautification Project",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+    href: "/about-us/our-leadership/portfolio",
   },
   {
     title: "Green Belt Development",
     category: "Landscape & Public Spaces",
     image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80",
+    href: "/about-us/our-leadership/portfolio",
   },
 ];
 
-export default function LeadershipProfilePage() {
+export default async function LeadershipProfilePage() {
+  // Fetch up to 4 of Arsalan's portfolio projects from DB
+  let portfolioItems: { title: string; category: string; image: string; href: string }[] = [];
+  try {
+    const rows = await db
+      .select()
+      .from(projects)
+      .where(eq(projects.isArsalan, true))
+      .orderBy(sql`${projects.createdAt} DESC`)
+      .limit(4);
+
+    if (rows.length > 0) {
+      portfolioItems = rows.map((p) => ({
+        title: p.title,
+        category: p.category,
+        image: p.coverImage,
+        href: `/portfolio/${p.slug}`,
+      }));
+    } else {
+      // Fall back to static placeholders while DB is empty
+      portfolioItems = portfolioFallback;
+    }
+  } catch {
+    portfolioItems = portfolioFallback;
+  }
+
   return (
     <>
       {/* ── 1. HERO ────────────────────────────────────────────── */}
@@ -367,7 +401,7 @@ export default function LeadershipProfilePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {portfolioItems.map((item, i) => (
-              <div key={i} className="group cursor-pointer">
+              <Link key={i} href={item.href} className="group cursor-pointer block">
                 <div className="relative w-full aspect-[4/3] overflow-hidden rounded-[10px] mb-3">
                   <Image
                     src={item.image}
@@ -376,10 +410,14 @@ export default function LeadershipProfilePage() {
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
+                  {/* Category badge */}
+                  <span className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-primary text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {item.category}
+                  </span>
                 </div>
-                <h4 className="text-charcoal font-bold text-[14px] mb-0.5">{item.title}</h4>
+                <h4 className="text-charcoal font-bold text-[14px] mb-0.5 group-hover:text-primary transition-colors">{item.title}</h4>
                 <p className="text-dark-gray/60 text-[12px]">{item.category}</p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

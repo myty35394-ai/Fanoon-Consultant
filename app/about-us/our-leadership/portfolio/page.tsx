@@ -7,7 +7,7 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import PortfolioGrid, { ProjectData } from "@/components/portfolio/PortfolioGrid";
 import { db } from "@/db";
 import { projects } from "@/db/schema";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 export const revalidate = 0;
 
@@ -31,6 +31,7 @@ export default async function LeadershipPortfolioPage() {
     const rows = await db
       .select()
       .from(projects)
+      .where(eq(projects.isArsalan, true))
       .orderBy(sql`${projects.createdAt} DESC`);
 
     dbProjects = rows.map((p) => ({

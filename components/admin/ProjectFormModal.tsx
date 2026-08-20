@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
-import { X, Loader2, Sparkles } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { X, Loader2, Sparkles, User } from "lucide-react";
 import ImageUploader from "@/components/admin/ImageUploader";
 
 export default function ProjectFormModal({
   isOpen,
   onClose,
   onSuccess,
+  defaultTab = "fanoon",
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  defaultTab?: "fanoon" | "arsalan";
 }) {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Architecture");
@@ -21,8 +23,14 @@ export default function ProjectFormModal({
   const [coverImage, setCoverImage] = useState("");
   const [description, setDescription] = useState("");
   const [featured, setFeatured] = useState(false);
+  const [isArsalan, setIsArsalan] = useState(defaultTab === "arsalan");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Sync isArsalan when defaultTab changes
+  useEffect(() => {
+    setIsArsalan(defaultTab === "arsalan");
+  }, [defaultTab]);
 
   if (!isOpen) return null;
 
@@ -44,6 +52,7 @@ export default function ProjectFormModal({
           coverImage: coverImage || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
           description,
           featured,
+          isArsalan,
         }),
       });
 
@@ -59,14 +68,15 @@ export default function ProjectFormModal({
         setLocation("");
         setCoverImage("");
         setDescription("");
+        setFeatured(false);
+        setIsArsalan(defaultTab === "arsalan");
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -186,16 +196,41 @@ export default function ProjectFormModal({
             />
           </div>
 
-          <div className="flex items-center gap-2 pt-2">
-            <input
-              type="checkbox"
-              id="featured"
-              checked={featured}
-              onChange={(e) => setFeatured(e.target.checked)}
-              className="w-4 h-4 rounded border-white/20 bg-[#1c261f] text-primary focus:ring-primary"
-            />
-            <label htmlFor="featured" className="text-white/80 font-medium">
-              Feature on Homepage Carousel
+          {/* Toggles */}
+          <div className="space-y-3 pt-2 pb-1">
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                id="featured"
+                checked={featured}
+                onChange={(e) => setFeatured(e.target.checked)}
+                className="w-4 h-4 rounded border-white/20 bg-[#1c261f] text-primary focus:ring-primary"
+              />
+              <span className="text-white/80 font-medium group-hover:text-white transition-colors">
+                Feature on Homepage Carousel
+              </span>
+            </label>
+
+            {/* Arsalan toggle */}
+            <label className={`flex items-center gap-3 cursor-pointer group p-3 rounded-xl border transition-all ${
+              isArsalan ? "bg-amber-500/10 border-amber-500/40" : "border-transparent"
+            }`}>
+              <input
+                type="checkbox"
+                id="isArsalan"
+                checked={isArsalan}
+                onChange={(e) => setIsArsalan(e.target.checked)}
+                className="w-4 h-4 rounded border-white/20 bg-[#1c261f] text-amber-500 focus:ring-amber-500"
+              />
+              <User className={`w-4 h-4 flex-shrink-0 ${isArsalan ? "text-amber-400" : "text-white/40"}`} />
+              <div>
+                <p className={`font-semibold ${isArsalan ? "text-amber-400" : "text-white/80"} transition-colors`}>
+                  Add to Ar. Arsalan&apos;s Portfolio
+                </p>
+                <p className="text-white/40 text-[11px] mt-0.5">
+                  Shows this project on Arsalan&apos;s personal leadership portfolio page
+                </p>
+              </div>
             </label>
           </div>
 

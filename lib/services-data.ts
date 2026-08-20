@@ -369,7 +369,7 @@ export const servicesData: ServiceDetail[] = [
       "We catch errors early, preventing costly rework and ensuring the final product meets your expectations.",
     ],
     introImage:
-      "https://images.unsplash.com/photo-1541888086913-913a48e788bc?w=800&q=80",
+      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80",
     pillars: [
       { icon: HardHat, label: "Site Safety" },
       { icon: CheckCircle2, label: "Quality Control" },

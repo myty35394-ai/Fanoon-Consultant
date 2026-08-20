@@ -75,7 +75,7 @@ const allProjects: ProjectData[] = [
     category: "Construction Supervision",
     subtitle: "G+8 Building",
     location: "Peshawar",
-    imageUrl: "https://images.unsplash.com/photo-1541888086913-913a48e788bc?w=800&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80",
     href: "#",
   },
   {

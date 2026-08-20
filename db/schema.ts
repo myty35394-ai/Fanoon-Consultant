@@ -66,6 +66,7 @@ export const projects = pgTable("projects", {
   coverImage: text("cover_image").notNull(),
   description: text("description"),
   featured: boolean("featured").default(false),
+  isArsalan: boolean("is_arsalan").default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

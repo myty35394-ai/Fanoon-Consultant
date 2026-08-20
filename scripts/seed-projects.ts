@@ -69,7 +69,7 @@ async function main() {
       client: "Commercial Developers Group",
       location: "Peshawar",
       year: "2022",
-      coverImage: "https://images.unsplash.com/photo-1541888086913-913a48e788bc?w=1200&q=80",
+      coverImage: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1200&q=80",
       description: "G+8 commercial office building with structured parking, double-skin façade and LEED-aligned mechanical systems. Achieved 30% energy savings over baseline.",
       featured: false,
     },
