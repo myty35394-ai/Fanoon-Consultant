@@ -16,7 +16,7 @@ import HeroSlider from "@/components/home/HeroSlider";
 import CtaBanner from "@/components/shared/CtaBanner";
 import { db } from "@/db";
 import { projects } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 export const metadata: Metadata = {
   title: "Fanoon Consultants | Architecture, Interior & Landscape Design",
@@ -36,21 +36,22 @@ export const metadata: Metadata = {
 export const revalidate = 0;
 
 export default async function Home() {
-  // Fetch up to 4 featured projects from the DB
+  // Fetch up to 4 featured Fanoon projects from the DB (exclude Arsalan-only projects)
   let featuredProjects: { title: string; category: string; location: string | null; coverImage: string; slug: string }[] = [];
   try {
     featuredProjects = await db
       .select()
       .from(projects)
-      .where(eq(projects.featured, true))
+      .where(and(eq(projects.featured, true), eq(projects.isArsalan, false)))
       .orderBy(sql`${projects.createdAt} DESC`)
       .limit(4);
 
-    // If no featured projects, fall back to the 4 most recent
+    // If no featured projects, fall back to the 4 most recent non-Arsalan projects
     if (featuredProjects.length === 0) {
       featuredProjects = await db
         .select()
         .from(projects)
+        .where(eq(projects.isArsalan, false))
         .orderBy(sql`${projects.createdAt} DESC`)
         .limit(4);
     }

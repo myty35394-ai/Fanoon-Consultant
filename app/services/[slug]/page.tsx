@@ -14,8 +14,11 @@ import CtaBanner from "@/components/shared/CtaBanner";
 
 import { servicesData, getServiceBySlug } from "@/lib/services-data";
 import { ProjectData } from "@/components/portfolio/PortfolioGrid";
+import { db } from "@/db";
+import { projects } from "@/db/schema";
+import { eq, sql } from "drizzle-orm";
 
-// Import sample project data from Portfolio
+// Fallback project data with working portfolio links
 const allProjects: ProjectData[] = [
   {
     title: "Cantt Heights",
@@ -23,7 +26,7 @@ const allProjects: ProjectData[] = [
     subtitle: "G+6 Mixed-Use Development",
     location: "Peshawar Cantonment",
     imageUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80",
-    href: "#",
+    href: "/portfolio/cantt-heights-mixed-use",
   },
   {
     title: "Green Heights",
@@ -31,14 +34,14 @@ const allProjects: ProjectData[] = [
     subtitle: "G+6 Mixed-Use Development",
     location: "Peshawar",
     imageUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80",
-    href: "#",
+    href: "/portfolio/green-heights-residential",
   },
   {
     title: "Luxury Apartment Interior",
     category: "Interior Design",
     location: "Islamabad",
     imageUrl: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&q=80",
-    href: "#",
+    href: "/portfolio/luxury-apartment-interior-islamabad",
   },
   {
     title: "Peshawar Cantt Beautification",
@@ -46,7 +49,7 @@ const allProjects: ProjectData[] = [
     subtitle: "Urban Design & Public Realm",
     location: "Peshawar Cantonment",
     imageUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80",
-    href: "#",
+    href: "/portfolio/cantt-beautification-peshawar",
   },
   {
     title: "10 Marla Residence",
@@ -54,21 +57,21 @@ const allProjects: ProjectData[] = [
     subtitle: "G+1 House",
     location: "Peshawar",
     imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
-    href: "#",
+    href: "/portfolio/10-marla-residence-peshawar",
   },
   {
     title: "Corporate Office Interior",
     category: "Interior Design",
     location: "Islamabad",
     imageUrl: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
-    href: "#",
+    href: "/portfolio/corporate-office-interior-islamabad",
   },
   {
     title: "Masterplan 3D Visualization",
     category: "3D Visualization",
     subtitle: "Residential Community",
     imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
-    href: "#",
+    href: "/portfolio/masterplan-3d-visualization",
   },
   {
     title: "Multi-Storey Building",
@@ -76,35 +79,35 @@ const allProjects: ProjectData[] = [
     subtitle: "G+8 Building",
     location: "Peshawar",
     imageUrl: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80",
-    href: "#",
+    href: "/portfolio/g8-building-supervision",
   },
   {
     title: "Green Belt Development",
     category: "Landscape Design",
     location: "Peshawar Cantonment",
     imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-    href: "#",
+    href: "/portfolio/green-belt-development",
   },
   {
     title: "1 Kanal Modern Residence",
     category: "Architecture",
     location: "Lahore",
     imageUrl: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80",
-    href: "#",
+    href: "/portfolio/1-kanal-modern-villa-lahore",
   },
   {
     title: "Residential Interior",
     category: "Interior Design",
     location: "Peshawar",
     imageUrl: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80",
-    href: "#",
+    href: "/portfolio/residential-interior-peshawar",
   },
   {
     title: "Project Management Services",
     category: "Project Management",
     location: "Multiple Locations",
     imageUrl: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80",
-    href: "#",
+    href: "/portfolio/project-management-services",
   },
 ];
 
@@ -144,9 +147,34 @@ export default async function ServiceDetailPage({
     notFound();
   }
 
-  const categoryProjects = allProjects
-    .filter((p) => p.category === service.projectCategory)
-    .slice(0, 4);
+  let categoryProjects: ProjectData[] = [];
+
+  try {
+    const dbRows = await db
+      .select()
+      .from(projects)
+      .where(eq(projects.category, service.projectCategory))
+      .orderBy(sql`${projects.createdAt} DESC`)
+      .limit(4);
+
+    if (dbRows.length > 0) {
+      categoryProjects = dbRows.map((p) => ({
+        title: p.title,
+        category: p.category,
+        subtitle: p.description ?? undefined,
+        location: p.location ?? undefined,
+        imageUrl: p.coverImage,
+        href: `/portfolio/${p.slug}`,
+      }));
+    }
+  } catch {}
+
+  // If no DB rows, fall back to predefined projects for that category
+  if (categoryProjects.length === 0) {
+    categoryProjects = allProjects
+      .filter((p) => p.category === service.projectCategory)
+      .slice(0, 4);
+  }
 
   return (
     <>

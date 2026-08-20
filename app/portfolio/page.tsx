@@ -15,7 +15,7 @@ import StatItem from "@/components/ui/StatItem";
 import PortfolioGrid, { ProjectData } from "@/components/portfolio/PortfolioGrid";
 import { db } from "@/db";
 import { projects } from "@/db/schema";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 export const revalidate = 0; // Always fetch fresh from DB
 
@@ -35,12 +35,13 @@ const stats = [
 /* ─── Page ────────────────────────────────────────────────────── */
 
 export default async function PortfolioPage() {
-  // Fetch all projects from Neon DB, newest first
+  // Fetch all Fanoon projects (exclude Arsalan-only) from Neon DB, newest first
   let dbProjects: ProjectData[] = [];
   try {
     const rows = await db
       .select()
       .from(projects)
+      .where(eq(projects.isArsalan, false))
       .orderBy(sql`${projects.createdAt} DESC`);
 
     dbProjects = rows.map((p) => ({
