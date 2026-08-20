@@ -21,6 +21,7 @@ import { db } from "@/db";
 import { jobPostings } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { seedStandardJobsIfEmpty } from "@/app/api/admin/jobs/route";
+import { getSiteSettings } from "@/lib/settings";
 
 export const revalidate = 60; // Revalidate every 60s for fresh job postings
 
@@ -45,22 +46,22 @@ const whyJoinCards = [
     image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80" 
   },
   { 
-    title: "Learning Culture", 
-    desc: "Access to training, mentorship and new experiences.", 
+    title: "Continuous Learning", 
+    desc: "Access workshops, mentorship, and professional development programs.", 
     icon: GraduationCap,
-    image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80" 
-  },
-  { 
-    title: "Supportive Team", 
-    desc: "A positive and inclusive environment that brings out the best in everyone.", 
-    icon: Users2,
     image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=80" 
   },
   { 
-    title: "Sustainable Vision", 
-    desc: "Contribute to designs that promote a better and sustainable future.", 
+    title: "Global Diversity", 
+    desc: "Be part of an inclusive team that celebrates diverse perspectives.", 
+    icon: Users2,
+    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&q=80" 
+  },
+  { 
+    title: "Sustainable Focus", 
+    desc: "Contribute to forward-thinking, sustainable design solutions.", 
     icon: Leaf,
-    image: "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?w=600&q=80" 
+    image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=600&q=80" 
   },
 ];
 
@@ -114,6 +115,7 @@ function getJobDestination(slug: string, title: string) {
 
 export default async function CareersPage() {
   await seedStandardJobsIfEmpty();
+  const settings = await getSiteSettings();
 
   const activeJobs = await db
     .select()
@@ -309,7 +311,7 @@ export default async function CareersPage() {
               <div className="text-[12.5px] leading-[1.6] text-dark-gray/80">
                 Don&apos;t see a role that fits?<br />
                 Send us your CV at <br className="hidden sm:block" />
-                <a href="mailto:careers@fanoonconsultants.com" className="text-primary font-medium hover:underline">careers@fanoonconsultants.com</a>
+                <a href={`mailto:${settings.careersEmail}`} className="text-primary font-medium hover:underline">{settings.careersEmail}</a>
               </div>
               <Link
                 href="/about-us/careers/general"

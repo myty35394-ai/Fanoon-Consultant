@@ -16,6 +16,7 @@ import {
   UserCheck,
   Building,
   Receipt,
+  Settings,
 } from "lucide-react";
 import { signOut } from "@/lib/auth-client";
 
@@ -23,15 +24,16 @@ export default function AdminSidebar() {
   const pathname = usePathname();
 
   const links = [
-    { name: "Overview",     href: "/admin",              icon: LayoutDashboard },
-    { name: "Inquiries",    href: "/admin/inquiries",    icon: Inbox },
-    { name: "Projects",     href: "/admin/projects",     icon: FolderKanban },
-    { name: "Invoices",     href: "/admin/invoices",     icon: Receipt },
-    { name: "Banks",        href: "/admin/banks",        icon: Building },
-    { name: "Job Postings", href: "/admin/jobs",         icon: Briefcase },
-    { name: "Applications", href: "/admin/applications", icon: UserCheck },
-    { name: "Blog Posts",   href: "/admin/blog",         icon: FileText },
-    { name: "Team Members", href: "/admin/team",         icon: Users },
+    { name: "Overview",      href: "/admin",              icon: LayoutDashboard },
+    { name: "Inquiries",     href: "/admin/inquiries",    icon: Inbox },
+    { name: "Projects",      href: "/admin/projects",     icon: FolderKanban },
+    { name: "Invoices",      href: "/admin/invoices",     icon: Receipt },
+    { name: "Banks",         href: "/admin/banks",        icon: Building },
+    { name: "Job Postings",  href: "/admin/jobs",         icon: Briefcase },
+    { name: "Applications",  href: "/admin/applications", icon: UserCheck },
+    { name: "Blog Posts",    href: "/admin/blog",         icon: FileText },
+    { name: "Team Members",  href: "/admin/team",         icon: Users },
+    { name: "Site Settings", href: "/admin/settings",     icon: Settings },
   ];
 
   return (

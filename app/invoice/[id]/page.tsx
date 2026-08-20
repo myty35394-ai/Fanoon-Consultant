@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { CheckCircle2, AlertCircle, Calendar, Receipt, Building, CreditCard } from "lucide-react";
 import PaymentForm from "./PaymentForm";
+import { getSiteSettings } from "@/lib/settings";
 
 export default async function PublicInvoicePage({
   params,
@@ -13,6 +14,7 @@ export default async function PublicInvoicePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const settings = await getSiteSettings();
 
   const data = await db
     .select()
@@ -168,7 +170,7 @@ export default async function PublicInvoicePage({
         </div>
 
         <div className="text-center text-dark-gray/50 text-xs font-medium">
-          If you have any questions regarding this invoice, please contact us at <a href="mailto:info@fanoonconsultants.com" className="text-primary hover:underline">info@fanoonconsultants.com</a>
+          If you have any questions regarding this invoice, please contact us at <a href={`mailto:${settings.primaryEmail}`} className="text-primary hover:underline">{settings.primaryEmail}</a>
         </div>
       </div>
     </div>

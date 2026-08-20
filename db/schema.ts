@@ -185,4 +185,26 @@ export const invoices = pgTable("invoices", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+export const siteSettings = pgTable("site_settings", {
+  id: text("id").primaryKey().default("general"),
+  companyName: text("company_name").default("Fanoon Consultants"),
+  primaryEmail: text("primary_email").default("fanoonconsultants9@gmail.com"),
+  secondaryEmail: text("secondary_email").default("info@fanoonconsultants.com"),
+  careersEmail: text("careers_email").default("careers@fanoonconsultants.com"),
+  primaryPhone: text("primary_phone").default("+92 318 9944488"),
+  secondaryPhone: text("secondary_phone"),
+  whatsappNumber: text("whatsapp_number").default("+92 318 9944488"),
+  officeAddress: text("office_address").default("Office # 202, 2nd Floor, Giga Center, Jinnah Avenue, Blue Area, Islamabad, Pakistan"),
+  officeHours: text("office_hours").default("Mon - Fri: 09:00 AM - 06:00 PM, Sat: 10:00 AM - 02:00 PM"),
+  googleMapsUrl: text("google_maps_url").default("https://www.google.com/maps/dir/?api=1&destination=Office+%23+202%2C+2nd+Floor%2C+Ginza+Center%2C+Jinnah+Avenue%2C+Blue+Area%2C+Islamabad%2C+Pakistan"),
+  facebookUrl: text("facebook_url").default("https://facebook.com"),
+  instagramUrl: text("instagram_url").default("https://instagram.com"),
+  linkedinUrl: text("linkedin_url").default("https://linkedin.com"),
+  youtubeUrl: text("youtube_url").default("https://youtube.com"),
+  pinterestUrl: text("pinterest_url").default("https://pinterest.com"),
+  twitterUrl: text("twitter_url").default("https://x.com"),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+
 

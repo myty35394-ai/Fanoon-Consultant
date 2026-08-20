@@ -18,6 +18,7 @@ import {
   UploadCloud
 } from "lucide-react";
 import StartProjectForm from "@/components/contact/StartProjectForm";
+import { getSiteSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Start A Project | Fanoon Consultants",
@@ -57,7 +58,8 @@ const STEPS = [
   },
 ];
 
-export default function StartProjectPage() {
+export default async function StartProjectPage() {
+  const settings = await getSiteSettings();
   return (
     <>
       {/* ── HERO SECTION ───────────────────────────────────── */}
@@ -224,13 +226,19 @@ export default function StartProjectPage() {
                   <p className="text-[13px] text-dark-gray">Call us directly or email us, we&apos;re here to help.</p>
                   
                   <div className="space-y-3 mt-4">
-                    <a href="tel:+923189944488" className="flex items-center gap-3 text-[14px] font-medium text-charcoal hover:text-primary transition-colors">
+                    <a
+                      href={`tel:${settings.primaryPhone.replace(/\s+/g, '')}`}
+                      className="flex items-center gap-3 text-[14px] font-medium text-charcoal hover:text-primary transition-colors"
+                    >
                       <Phone className="w-4 h-4 text-primary" />
-                      +92 318 9944488
+                      {settings.primaryPhone}
                     </a>
-                    <a href="mailto:fanoonconsultants9@gmail.com" className="flex items-center gap-3 text-[14px] font-medium text-charcoal hover:text-primary transition-colors break-all">
+                    <a
+                      href={`mailto:${settings.primaryEmail}`}
+                      className="flex items-center gap-3 text-[14px] font-medium text-charcoal hover:text-primary transition-colors break-all"
+                    >
                       <Mail className="w-4 h-4 text-primary flex-shrink-0" />
-                      fanoonconsultants9@gmail.com
+                      {settings.primaryEmail}
                     </a>
                   </div>
                 </div>

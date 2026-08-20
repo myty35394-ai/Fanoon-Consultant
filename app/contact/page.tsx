@@ -9,36 +9,12 @@ import {
 
 import Button from "@/components/ui/Button";
 import ContactForm from "@/components/contact/ContactForm";
+import { getSiteSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Contact | Fanoon Consultants",
   description:
     "Have a project in mind? Reach out to Fanoon Consultants — a multidisciplinary architecture and design consultancy in Islamabad. Our team responds within 24 hours.",
-};
-
-const OFFICE_ADDRESS =
-  "Office # 202, 2nd Floor, Ginza Center, Jinnah Avenue, Blue Area, Islamabad, Pakistan";
-
-const GOOGLE_MAPS_URL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-  OFFICE_ADDRESS
-)}`;
-
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: "https://fanoonconsultants.com/" },
-    { "@type": "ListItem", position: 2, name: "Contact", item: "https://fanoonconsultants.com/contact" },
-  ],
-};
-
-const contactPointJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "ContactPoint",
-  telephone: "+92-318-9944488",
-  email: "fanoonconsultants9@gmail.com",
-  contactType: "Customer Service",
-  hoursAvailable: "Mo-Fr 09:00-18:00, Sa 10:00-14:00",
 };
 
 const landmarks = [
@@ -48,51 +24,83 @@ const landmarks = [
   "Islamabad Expressway – 2.5 km",
 ];
 
-const socialLinks = [
-  {
-    label: "Facebook",
-    href: "https://facebook.com",
-    svg: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-      </svg>
-    ),
-  },
-  {
-    label: "LinkedIn",
-    href: "https://linkedin.com",
-    svg: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-        <rect x="2" y="9" width="4" height="12" />
-        <circle cx="4" cy="4" r="2" />
-      </svg>
-    ),
-  },
-  {
-    label: "Instagram",
-    href: "https://instagram.com",
-    svg: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-      </svg>
-    ),
-  },
-  {
-    label: "YouTube",
-    href: "https://youtube.com",
-    svg: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
-        <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" />
-      </svg>
-    ),
-  },
-];
+export default async function ContactPage() {
+  const settings = await getSiteSettings();
 
-export default function ContactPage() {
+  const officeAddress = settings.officeAddress;
+  const googleMapsUrl = settings.googleMapsUrl || `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(officeAddress)}`;
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://fanoonconsultants.com/" },
+      { "@type": "ListItem", position: 2, name: "Contact", item: "https://fanoonconsultants.com/contact" },
+    ],
+  };
+
+  const contactPointJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ContactPoint",
+    telephone: settings.primaryPhone,
+    email: settings.primaryEmail,
+    contactType: "Customer Service",
+    hoursAvailable: settings.officeHours,
+  };
+
+  const socialLinks = [
+    settings.facebookUrl && {
+      label: "Facebook",
+      href: settings.facebookUrl,
+      svg: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+        </svg>
+      ),
+    },
+    settings.linkedinUrl && {
+      label: "LinkedIn",
+      href: settings.linkedinUrl,
+      svg: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+          <rect x="2" y="9" width="4" height="12" />
+          <circle cx="4" cy="4" r="2" />
+        </svg>
+      ),
+    },
+    settings.instagramUrl && {
+      label: "Instagram",
+      href: settings.instagramUrl,
+      svg: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+        </svg>
+      ),
+    },
+    settings.youtubeUrl && {
+      label: "YouTube",
+      href: settings.youtubeUrl,
+      svg: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
+          <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" />
+        </svg>
+      ),
+    },
+    settings.pinterestUrl && {
+      label: "Pinterest",
+      href: settings.pinterestUrl,
+      svg: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      ),
+    },
+  ].filter(Boolean) as { label: string; href: string; svg: React.ReactNode }[];
   return (
     <>
       {/* JSON-LD */}
@@ -176,9 +184,7 @@ export default function ContactPage() {
                   <p className="text-[15px] font-bold text-charcoal">Our Office</p>
                 </div>
                 <div className="text-[12.5px] text-dark-gray leading-[1.65]">
-                  <p>Office # 202, 2nd Floor,</p>
-                  <p>Ginza Center, Jinnah Avenue,</p>
-                  <p>Blue Area, Islamabad, Pakistan.</p>
+                  <p className="whitespace-pre-line">{settings.officeAddress}</p>
                 </div>
               </div>
             </div>
@@ -191,8 +197,10 @@ export default function ContactPage() {
                   <p className="text-[15px] font-bold text-charcoal">Call Us</p>
                 </div>
                 <div className="text-[12.5px] text-dark-gray leading-[1.65]">
-                  <p>+92 318 9944488</p>
-                  <p>Mon - Sat: 9:00 AM - 6:00 PM</p>
+                  <a href={`tel:${settings.primaryPhone.replace(/\s+/g, '')}`} className="hover:text-primary transition-colors block font-medium">
+                    {settings.primaryPhone}
+                  </a>
+                  <p className="text-dark-gray/70">{settings.officeHours}</p>
                 </div>
               </div>
             </div>
@@ -205,8 +213,10 @@ export default function ContactPage() {
                   <p className="text-[15px] font-bold text-charcoal">Email Us</p>
                 </div>
                 <div className="text-[12.5px] text-dark-gray leading-[1.65] break-words">
-                  <p className="break-all">fanoonconsultants9@gmail.com</p>
-                  <p>We reply within 24 hours</p>
+                  <a href={`mailto:${settings.primaryEmail}`} className="hover:text-primary transition-colors break-all block font-medium">
+                    {settings.primaryEmail}
+                  </a>
+                  <p className="text-dark-gray/70">We reply within 24 hours</p>
                 </div>
               </div>
             </div>
@@ -219,8 +229,7 @@ export default function ContactPage() {
                   <p className="text-[15px] font-bold text-charcoal">Office Hours</p>
                 </div>
                 <div className="text-[12.5px] text-dark-gray leading-[1.65]">
-                  <p>Mon - Fri: 9:00 AM - 6:00 PM</p>
-                  <p>Saturday: 10:00 AM - 2:00 PM</p>
+                  <p className="whitespace-pre-line">{settings.officeHours}</p>
                 </div>
               </div>
             </div>
@@ -312,10 +321,8 @@ export default function ContactPage() {
 
                 <div className="flex items-start gap-3 mb-5">
                   <MapPin className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" strokeWidth={1.5} />
-                  <p className="text-white/80 text-[13px] leading-relaxed">
-                    Office # 202, 2nd Floor,<br />
-                    Ginza Center, Jinnah Avenue,<br />
-                    Blue Area, Islamabad, Pakistan.
+                  <p className="text-white/80 text-[13px] leading-relaxed whitespace-pre-line">
+                    {settings.officeAddress}
                   </p>
                 </div>
 
@@ -335,7 +342,7 @@ export default function ContactPage() {
 
                 {/* Get Directions */}
                 <a
-                  href={GOOGLE_MAPS_URL}
+                  href={googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full border border-white/20 hover:border-primary/60 text-white hover:text-primary text-[11px] font-bold uppercase tracking-[0.18em] py-3 rounded-lg transition-all duration-200 hover:bg-primary/5"

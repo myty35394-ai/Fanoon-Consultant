@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
 import Footer from "@/components/ui/Footer";
+import { getSiteSettings } from "@/lib/settings";
 
 const poppins = Poppins({
   variable: "--font-sans",
@@ -26,16 +27,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+
   // Organization Schema
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
-    name: "Fanoon Consultants",
+    name: settings.companyName || "Fanoon Consultants",
     logo: "https://fanoonconsultants.com/logo.png",
     url: "https://fanoonconsultants.com",
     description: "Architecture and design consultancy.",
@@ -52,7 +55,7 @@ export default function RootLayout({
         <main className="flex-1">
           {children}
         </main>
-        <Footer />
+        <Footer initialSettings={settings} />
       </body>
     </html>
   );
