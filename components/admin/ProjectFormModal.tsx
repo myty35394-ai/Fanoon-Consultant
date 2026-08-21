@@ -28,6 +28,12 @@ export default function ProjectFormModal({
   const [client, setClient] = useState("");
   const [location, setLocation] = useState("");
   const [year, setYear] = useState("2026");
+  const [tagline, setTagline] = useState("");
+  const [plotSize, setPlotSize] = useState("");
+  const [area, setArea] = useState("");
+  const [floors, setFloors] = useState("");
+  const [scope, setScope] = useState("");
+  const [status, setStatus] = useState("Completed");
   const [coverImage, setCoverImage] = useState("");
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([]);
@@ -90,6 +96,12 @@ export default function ProjectFormModal({
           client,
           location,
           year,
+          tagline,
+          plotSize,
+          area,
+          floors,
+          scope,
+          status,
           coverImage: coverImage || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
           galleryImages: galleryImages.filter(Boolean),
           teamMembers: selectedTeamIds,
@@ -109,6 +121,12 @@ export default function ProjectFormModal({
         setTitle("");
         setClient("");
         setLocation("");
+        setTagline("");
+        setPlotSize("");
+        setArea("");
+        setFloors("");
+        setScope("");
+        setStatus("Completed");
         setCoverImage("");
         setGalleryImages([]);
         setSelectedTeamIds([]);
@@ -219,6 +237,96 @@ export default function ProjectFormModal({
                 className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
               />
             </div>
+          </div>
+
+          {/* Tagline */}
+          <div>
+            <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
+              Tagline <span className="text-white/30 normal-case text-[10px] font-normal">(short hero subtitle)</span>
+            </label>
+            <input
+              type="text"
+              value={tagline}
+              onChange={(e) => setTagline(e.target.value)}
+              placeholder="e.g. Realistic. Detailed. Inspiring."
+              className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
+            />
+          </div>
+
+          {/* Plot Size & Area */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
+                Plot Size
+              </label>
+              <input
+                type="text"
+                value={plotSize}
+                onChange={(e) => setPlotSize(e.target.value)}
+                placeholder="e.g. 10 Marla / 1 Kanal"
+                className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
+              />
+            </div>
+            <div>
+              <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
+                Built-up Area
+              </label>
+              <input
+                type="text"
+                value={area}
+                onChange={(e) => setArea(e.target.value)}
+                placeholder="e.g. 3,200 SQ FT"
+                className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Floors & Scope */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
+                Floors
+              </label>
+              <input
+                type="text"
+                value={floors}
+                onChange={(e) => setFloors(e.target.value)}
+                placeholder="e.g. G+1 / G+3"
+                className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
+              />
+            </div>
+            <div>
+              <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
+                Scope
+              </label>
+              <input
+                type="text"
+                value={scope}
+                onChange={(e) => setScope(e.target.value)}
+                placeholder="e.g. Exterior Visualization"
+                className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
+              Project Status
+            </label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
+            >
+              <option value="Completed">Completed</option>
+              <option value="Completed (2025)">Completed (2025)</option>
+              <option value="Completed (2024)">Completed (2024)</option>
+              <option value="Completed (2023)">Completed (2023)</option>
+              <option value="Ongoing">Ongoing</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Under Construction">Under Construction</option>
+            </select>
           </div>
 
           <ImageUploader

@@ -67,6 +67,12 @@ export const projects = pgTable("projects", {
   galleryImages: text("gallery_images").default("[]"), // JSON array of up to 5 uploaded gallery image URLs
   teamMembers: text("team_members").default("[]"), // JSON array of selected team member IDs
   description: text("description"),
+  tagline: text("tagline"),        // Short punchy hero subtitle (e.g. "Realistic. Detailed. Inspiring.")
+  plotSize: text("plot_size"),     // e.g. "10 Marla", "1 Kanal"
+  area: text("area"),              // e.g. "3,200 SQ FT"
+  floors: text("floors"),          // e.g. "G+1", "G+3"
+  scope: text("scope"),            // e.g. "Exterior Visualization", "Interior Design"
+  status: text("status"),          // e.g. "Completed (2025)", "Ongoing"
   featured: boolean("featured").default(false),
   isArsalan: boolean("is_arsalan").default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
