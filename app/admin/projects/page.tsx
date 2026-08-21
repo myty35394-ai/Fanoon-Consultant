@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Plus, Trash2, FolderKanban, Loader2, User } from "lucide-react";
+import { Plus, Trash2, Pencil, FolderKanban, Loader2, User } from "lucide-react";
 import ProjectFormModal from "@/components/admin/ProjectFormModal";
 
 export interface ProjectRecord {
@@ -14,10 +14,26 @@ export interface ProjectRecord {
   location: string | null;
   year: string | null;
   coverImage: string;
+  galleryImages?: string | string[] | null;
+  spaceNames?: string | string[] | null;
+  drawingImages?: string | string[] | null;
+  teamMembers?: string | string[] | null;
+  materialsData?: string | any | null;
+  conceptData?: string | any | null;
   description: string | null;
+  tagline?: string | null;
+  plotSize?: string | null;
+  area?: string | null;
+  floors?: string | null;
+  scope?: string | null;
+  status?: string | null;
+  duration?: string | null;
+  structure?: string | null;
+  constructionType?: string | null;
   featured: boolean | null;
   isArsalan: boolean | null;
   createdAt: Date;
+  updatedAt?: Date;
 }
 
 type Tab = "fanoon" | "arsalan";
@@ -27,6 +43,7 @@ export default function AdminProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("fanoon");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<ProjectRecord | null>(null);
 
   const fetchProjects = async () => {
     setLoading(true);
@@ -80,8 +97,11 @@ export default function AdminProjectsPage() {
         </div>
 
         <button
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-primary/20"
+          onClick={() => {
+            setEditingProject(null);
+            setIsModalOpen(true);
+          }}
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-primary/20 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           Add New Project
@@ -143,8 +163,11 @@ export default function AdminProjectsPage() {
               : "Get started by adding your first project entry."}
           </p>
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white text-xs font-bold uppercase tracking-wider"
+            onClick={() => {
+              setEditingProject(null);
+              setIsModalOpen(true);
+            }}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white text-xs font-bold uppercase tracking-wider cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Add First Project
@@ -192,17 +215,29 @@ export default function AdminProjectsPage() {
                 </div>
 
                 <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-white/50">
-                  <div>
+                  <div className="truncate pr-2">
                     {prj.location && <span>{prj.location}</span>}
                     {prj.year && <span> • {prj.year}</span>}
                   </div>
-                  <button
-                    onClick={() => handleDelete(prj.id, prj.title)}
-                    className="p-2 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                    title="Delete project"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => {
+                        setEditingProject(prj);
+                        setIsModalOpen(true);
+                      }}
+                      className="p-2 text-white/50 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors cursor-pointer"
+                      title="Edit project"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(prj.id, prj.title)}
+                      className="p-2 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
+                      title="Delete project"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -214,7 +249,11 @@ export default function AdminProjectsPage() {
       <ProjectFormModal
         isOpen={isModalOpen}
         defaultTab={activeTab}
-        onClose={() => setIsModalOpen(false)}
+        projectToEdit={editingProject}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingProject(null);
+        }}
         onSuccess={fetchProjects}
       />
     </div>

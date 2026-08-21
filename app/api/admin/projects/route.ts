@@ -97,6 +97,91 @@ export async function POST(req: Request) {
   }
 }
 
+export async function PUT(req: Request) {
+  try {
+    const body = await req.json();
+    const {
+      id,
+      title,
+      category,
+      client,
+      location,
+      year,
+      coverImage,
+      galleryImages,
+      drawingImages,
+      teamMembers,
+      description,
+      featured,
+      isArsalan,
+      tagline,
+      plotSize,
+      area,
+      floors,
+      scope,
+      status,
+      duration,
+      structure,
+      constructionType,
+      materialsData,
+      conceptData,
+      spaceNames,
+    } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Project ID is required." }, { status: 400 });
+    }
+
+    if (!title || !category || !coverImage) {
+      return NextResponse.json(
+        { error: "Title, category, and cover image are required." },
+        { status: 400 }
+      );
+    }
+
+    const updated = await db
+      .update(projects)
+      .set({
+        title,
+        category,
+        client: client || null,
+        location: location || null,
+        year: year || new Date().getFullYear().toString(),
+        coverImage,
+        galleryImages: Array.isArray(galleryImages) ? JSON.stringify(galleryImages.slice(0, 5)) : typeof galleryImages === "string" ? galleryImages : "[]",
+        drawingImages: Array.isArray(drawingImages) ? JSON.stringify(drawingImages.slice(0, 3)) : typeof drawingImages === "string" ? drawingImages : "[]",
+        teamMembers: Array.isArray(teamMembers) ? JSON.stringify(teamMembers) : typeof teamMembers === "string" ? teamMembers : "[]",
+        description: description || null,
+        tagline: tagline || null,
+        plotSize: plotSize || null,
+        area: area || null,
+        floors: floors || null,
+        scope: scope || null,
+        status: status || null,
+        duration: duration || null,
+        structure: structure || null,
+        constructionType: constructionType || null,
+        materialsData: materialsData ? (typeof materialsData === "string" ? materialsData : JSON.stringify(materialsData)) : null,
+        conceptData: conceptData ? (typeof conceptData === "string" ? conceptData : JSON.stringify(conceptData)) : null,
+        spaceNames: Array.isArray(spaceNames) ? JSON.stringify(spaceNames.slice(0, 5)) : typeof spaceNames === "string" ? spaceNames : "[]",
+        featured: Boolean(featured),
+        isArsalan: Boolean(isArsalan),
+        updatedAt: new Date(),
+      })
+      .where(eq(projects.id, id))
+      .returning();
+
+    if (updated.length === 0) {
+      return NextResponse.json({ error: "Project not found." }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, project: updated[0] });
+  } catch (error) {
+    console.error("Error updating project:", error);
+    return NextResponse.json({ error: "Failed to update project" }, { status: 500 });
+  }
+}
+
 export async function DELETE(req: Request) {
   try {
     const { searchParams } = new URL(req.url);

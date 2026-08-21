@@ -39,16 +39,47 @@ const CATEGORIES = [
   { id: "Project Management", label: "Project Management", icon: ClipboardCheck },
 ];
 
+interface ProjectToEdit {
+  id: string;
+  slug?: string;
+  title: string;
+  category: string;
+  client?: string | null;
+  location?: string | null;
+  year?: string | null;
+  coverImage: string;
+  galleryImages?: string | string[] | null;
+  spaceNames?: string | string[] | null;
+  drawingImages?: string | string[] | null;
+  teamMembers?: string | string[] | null;
+  materialsData?: string | any | null;
+  conceptData?: string | any | null;
+  description?: string | null;
+  tagline?: string | null;
+  plotSize?: string | null;
+  area?: string | null;
+  floors?: string | null;
+  scope?: string | null;
+  status?: string | null;
+  duration?: string | null;
+  structure?: string | null;
+  constructionType?: string | null;
+  featured?: boolean | null;
+  isArsalan?: boolean | null;
+}
+
 export default function ProjectFormModal({
   isOpen,
   onClose,
   onSuccess,
   defaultTab = "fanoon",
+  projectToEdit = null,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   defaultTab?: "fanoon" | "arsalan";
+  projectToEdit?: ProjectToEdit | null;
 }) {
   // Form State
   const [title, setTitle] = useState("");
@@ -95,17 +126,130 @@ export default function ProjectFormModal({
   const [matMetal, setMatMetal] = useState("");
   const [matSustainable, setMatSustainable] = useState("");
 
-
   // Auxiliary
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [allTeamMembers, setAllTeamMembers] = useState<TeamMember[]>([]);
   const [loadingTeam, setLoadingTeam] = useState(false);
 
-  // Sync default tab
+  // Sync form state with projectToEdit or default tab
   useEffect(() => {
-    setIsArsalan(defaultTab === "arsalan");
-  }, [defaultTab]);
+    if (!isOpen) return;
+
+    if (projectToEdit) {
+      setTitle(projectToEdit.title || "");
+      setCategory(projectToEdit.category || "Architecture");
+      setTagline(projectToEdit.tagline || "");
+      setClient(projectToEdit.client || "");
+      setLocation(projectToEdit.location || "");
+      setYear(projectToEdit.year || new Date().getFullYear().toString());
+      setStatus(projectToEdit.status || "Completed");
+      setPlotSize(projectToEdit.plotSize || "");
+      setArea(projectToEdit.area || "");
+      setFloors(projectToEdit.floors || "");
+      setScope(projectToEdit.scope || "");
+      setDuration(projectToEdit.duration || "");
+      setConstructionType(projectToEdit.constructionType || "");
+      setDescription(projectToEdit.description || "");
+      setCoverImage(projectToEdit.coverImage || "");
+
+      // Gallery Images
+      let gImgs: string[] = [];
+      if (Array.isArray(projectToEdit.galleryImages)) {
+        gImgs = projectToEdit.galleryImages;
+      } else if (typeof projectToEdit.galleryImages === "string") {
+        try { gImgs = JSON.parse(projectToEdit.galleryImages); } catch {}
+      }
+      setGalleryImages(gImgs);
+
+      // Space Names
+      let sNames: string[] = [];
+      if (Array.isArray(projectToEdit.spaceNames)) {
+        sNames = projectToEdit.spaceNames;
+      } else if (typeof projectToEdit.spaceNames === "string") {
+        try { sNames = JSON.parse(projectToEdit.spaceNames); } catch {}
+      }
+      while (sNames.length < gImgs.length) sNames.push("");
+      setSpaceNames(sNames);
+
+      // Drawing Images
+      let dImgs: string[] = [];
+      if (Array.isArray(projectToEdit.drawingImages)) {
+        dImgs = projectToEdit.drawingImages;
+      } else if (typeof projectToEdit.drawingImages === "string") {
+        try { dImgs = JSON.parse(projectToEdit.drawingImages); } catch {}
+      }
+      setDrawingImages(dImgs);
+
+      // Team Members
+      let tMembers: string[] = [];
+      if (Array.isArray(projectToEdit.teamMembers)) {
+        tMembers = projectToEdit.teamMembers;
+      } else if (typeof projectToEdit.teamMembers === "string") {
+        try { tMembers = JSON.parse(projectToEdit.teamMembers); } catch {}
+      }
+      setSelectedTeamIds(tMembers);
+
+      // Featured & Arsalan
+      setFeatured(Boolean(projectToEdit.featured));
+      setIsArsalan(Boolean(projectToEdit.isArsalan));
+
+      // Concept Data
+      let cData: any = null;
+      if (typeof projectToEdit.conceptData === "string") {
+        try { cData = JSON.parse(projectToEdit.conceptData); } catch {}
+      } else if (typeof projectToEdit.conceptData === "object") {
+        cData = projectToEdit.conceptData;
+      }
+      setConceptTitle(cData?.title || "");
+      setConceptDescription(cData?.description || "");
+      setConceptFeatures(Array.isArray(cData?.features) ? cData.features.join("\n") : "");
+
+      // Materials Data
+      let mData: any = null;
+      if (typeof projectToEdit.materialsData === "string") {
+        try { mData = JSON.parse(projectToEdit.materialsData); } catch {}
+      } else if (typeof projectToEdit.materialsData === "object") {
+        mData = projectToEdit.materialsData;
+      }
+      setMatConcept(mData?.concept || "");
+      setMatQuote(mData?.quote || "");
+      setMatExterior(Array.isArray(mData?.exteriorFinishes) ? mData.exteriorFinishes.join("\n") : "");
+      setMatFloors(Array.isArray(mData?.interiorFloors) ? mData.interiorFloors.join("\n") : "");
+      setMatWalls(Array.isArray(mData?.interiorWalls) ? mData.interiorWalls.join("\n") : "");
+      setMatCeiling(Array.isArray(mData?.ceilingLighting) ? mData.ceilingLighting.join("\n") : "");
+      setMatJoinery(Array.isArray(mData?.joineryMillwork) ? mData.joineryMillwork.join("\n") : "");
+      setMatMetal(Array.isArray(mData?.metalGlass) ? mData.metalGlass.join("\n") : "");
+      setMatSustainable(Array.isArray(mData?.sustainableChoices) ? mData.sustainableChoices.join("\n") : "");
+    } else {
+      // Clean reset
+      setTitle("");
+      setCategory("Architecture");
+      setTagline("");
+      setClient("");
+      setLocation("");
+      setYear("2026");
+      setStatus("Completed");
+      setPlotSize("");
+      setArea("");
+      setFloors("");
+      setScope("");
+      setDuration("");
+      setConstructionType("");
+      setDescription("");
+      setCoverImage("");
+      setGalleryImages([]);
+      setSpaceNames([]);
+      setDrawingImages([]);
+      setSelectedTeamIds([]);
+      setFeatured(false);
+      setIsArsalan(defaultTab === "arsalan");
+      setConceptTitle(""); setConceptDescription(""); setConceptFeatures("");
+      setMatConcept(""); setMatQuote(""); setMatExterior(""); setMatFloors("");
+      setMatWalls(""); setMatCeiling(""); setMatJoinery(""); setMatMetal(""); setMatSustainable("");
+    }
+    setError("");
+  }, [isOpen, projectToEdit, defaultTab]);
 
   // Load team members
   useEffect(() => {
@@ -207,11 +351,14 @@ export default function ProjectFormModal({
       sustainableChoices: splitLines(matSustainable).length ? splitLines(matSustainable) : undefined,
     } : undefined;
 
+    const isEdit = Boolean(projectToEdit?.id);
+
     try {
       const res = await fetch("/api/admin/projects", {
-        method: "POST",
+        method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          ...(isEdit ? { id: projectToEdit!.id } : {}),
           title: title.trim(),
           category,
           client: client.trim() || null,
@@ -240,34 +387,10 @@ export default function ProjectFormModal({
 
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Failed to create project.");
+        setError(data.error || `Failed to ${isEdit ? "update" : "create"} project.`);
       } else {
         onSuccess();
         onClose();
-        // Reset fields
-        setTitle("");
-        setTagline("");
-        setClient("");
-        setLocation("");
-        setYear("2026");
-        setStatus("Completed");
-        setPlotSize("");
-        setArea("");
-        setFloors("");
-        setScope("");
-        setDuration("");
-        setConstructionType("");
-        setDescription("");
-        setCoverImage("");
-        setGalleryImages([]);
-        setSpaceNames([]);
-        setDrawingImages([]);
-        setSelectedTeamIds([]);
-        setFeatured(false);
-        setIsArsalan(defaultTab === "arsalan");
-        setConceptTitle(""); setConceptDescription(""); setConceptFeatures("");
-        setMatConcept(""); setMatQuote(""); setMatExterior(""); setMatFloors("");
-        setMatWalls(""); setMatCeiling(""); setMatJoinery(""); setMatMetal(""); setMatSustainable("");
       }
     } catch {
       setError("An unexpected error occurred. Please try again.");
@@ -287,10 +410,12 @@ export default function ProjectFormModal({
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-white leading-tight">
-                Add New Project
+                {projectToEdit ? "Edit Project" : "Add New Project"}
               </h2>
               <p className="text-xs text-white/50">
-                Fill in the details below to publish a new portfolio project
+                {projectToEdit
+                  ? `Editing details for "${projectToEdit.title}"`
+                  : "Fill in the details below to publish a new portfolio project"}
               </p>
             </div>
           </div>
@@ -922,11 +1047,11 @@ export default function ProjectFormModal({
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Publishing...
+                  <Loader2 className="w-4 h-4 animate-spin" /> {projectToEdit ? "Saving Changes..." : "Publishing..."}
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4" /> Publish Project
+                  <Sparkles className="w-4 h-4" /> {projectToEdit ? "Save Changes" : "Publish Project"}
                 </>
               )}
             </button>
