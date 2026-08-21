@@ -19,7 +19,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { title, category, client, location, year, coverImage, description, featured, isArsalan } = body;
+    const { title, category, client, location, year, coverImage, galleryImages, teamMembers, description, featured, isArsalan } = body;
 
     if (!title || !category || !coverImage) {
       return NextResponse.json(
@@ -44,6 +44,8 @@ export async function POST(req: Request) {
         location: location || null,
         year: year || new Date().getFullYear().toString(),
         coverImage,
+        galleryImages: Array.isArray(galleryImages) ? JSON.stringify(galleryImages) : typeof galleryImages === "string" ? galleryImages : "[]",
+        teamMembers: Array.isArray(teamMembers) ? JSON.stringify(teamMembers) : typeof teamMembers === "string" ? teamMembers : "[]",
         description: description || null,
         featured: Boolean(featured),
         isArsalan: Boolean(isArsalan),

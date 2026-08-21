@@ -1,8 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Loader2, Sparkles, User } from "lucide-react";
+import Image from "next/image";
+import { X, Loader2, Sparkles, User, Trash2, Users, Check } from "lucide-react";
 import ImageUploader from "@/components/admin/ImageUploader";
+
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  imageUrl: string;
+}
 
 export default function ProjectFormModal({
   isOpen,
@@ -21,18 +29,51 @@ export default function ProjectFormModal({
   const [location, setLocation] = useState("");
   const [year, setYear] = useState("2026");
   const [coverImage, setCoverImage] = useState("");
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [featured, setFeatured] = useState(false);
   const [isArsalan, setIsArsalan] = useState(defaultTab === "arsalan");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [allTeamMembers, setAllTeamMembers] = useState<TeamMember[]>([]);
+  const [loadingTeam, setLoadingTeam] = useState(false);
 
   // Sync isArsalan when defaultTab changes
   useEffect(() => {
     setIsArsalan(defaultTab === "arsalan");
   }, [defaultTab]);
 
+  // Load team members when modal opens
+  useEffect(() => {
+    if (!isOpen) return;
+    setLoadingTeam(true);
+    fetch("/api/admin/team")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data.members)) setAllTeamMembers(data.members);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingTeam(false));
+  }, [isOpen]);
+
   if (!isOpen) return null;
+
+  const handleAddGalleryImage = (url: string) => {
+    if (url && galleryImages.length < 5) {
+      setGalleryImages([...galleryImages, url]);
+    }
+  };
+
+  const handleRemoveGalleryImage = (index: number) => {
+    setGalleryImages(galleryImages.filter((_, idx) => idx !== index));
+  };
+
+  const toggleTeamMember = (id: string) => {
+    setSelectedTeamIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +91,8 @@ export default function ProjectFormModal({
           location,
           year,
           coverImage: coverImage || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
+          galleryImages: galleryImages.filter(Boolean),
+          teamMembers: selectedTeamIds,
           description,
           featured,
           isArsalan,
@@ -67,6 +110,8 @@ export default function ProjectFormModal({
         setClient("");
         setLocation("");
         setCoverImage("");
+        setGalleryImages([]);
+        setSelectedTeamIds([]);
         setDescription("");
         setFeatured(false);
         setIsArsalan(defaultTab === "arsalan");
@@ -180,8 +225,124 @@ export default function ProjectFormModal({
             value={coverImage}
             onChange={setCoverImage}
             folder="fanoon-consultants/projects"
-            label="Cover Image"
+            label="Cover Image *"
           />
+
+          {/* 5 Project Gallery Images */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <label className="block font-medium text-white/70 uppercase tracking-wider">
+                Project Gallery Images ({galleryImages.length}/5)
+              </label>
+              <span className="text-[11px] text-white/40">Upload up to 5 photos for gallery</span>
+            </div>
+
+            {/* Current gallery previews */}
+            {galleryImages.length > 0 && (
+              <div className="grid grid-cols-5 gap-2.5">
+                {galleryImages.map((imgUrl, idx) => (
+                  <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-white/20 group">
+                    <Image src={imgUrl} alt={`Gallery image ${idx + 1}`} fill className="object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveGalleryImage(idx)}
+                      className="absolute top-1 right-1 p-1 bg-red-600/90 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                    <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/70 text-[9px] text-white font-bold rounded">
+                      #{idx + 1}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Upload next gallery slot if less than 5 */}
+            {galleryImages.length < 5 && (
+              <div className="p-3.5 bg-[#18221b] border border-white/10 border-dashed rounded-xl space-y-2">
+                <ImageUploader
+                  value=""
+                  onChange={(url) => handleAddGalleryImage(url)}
+                  folder="fanoon-consultants/projects/gallery"
+                  label={`Add Gallery Photo (${galleryImages.length + 1} of 5)`}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Team Member Selection */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <label className="block font-medium text-white/70 uppercase tracking-wider flex items-center gap-2">
+                <Users className="w-3.5 h-3.5 text-primary" />
+                Assign Team Members
+                {selectedTeamIds.length > 0 && (
+                  <span className="ml-1 px-1.5 py-0.5 bg-primary/20 text-primary rounded text-[10px] font-bold">
+                    {selectedTeamIds.length} selected
+                  </span>
+                )}
+              </label>
+              <span className="text-[11px] text-white/40">Select who worked on this project</span>
+            </div>
+
+            <div className="bg-[#18221b] border border-white/10 rounded-xl p-3">
+              {loadingTeam ? (
+                <div className="flex items-center justify-center py-6 gap-2 text-white/40">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-xs">Loading team members...</span>
+                </div>
+              ) : allTeamMembers.length === 0 ? (
+                <div className="text-center py-6 text-white/30 text-xs">
+                  <User className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                  No team members found. Add team members in the Team section first.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto no-scrollbar">
+                  {allTeamMembers.map((member) => {
+                    const isSelected = selectedTeamIds.includes(member.id);
+                    return (
+                      <button
+                        key={member.id}
+                        type="button"
+                        onClick={() => toggleTeamMember(member.id)}
+                        className={`flex items-center gap-2.5 p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                          isSelected
+                            ? "border-primary/50 bg-primary/10"
+                            : "border-white/10 bg-[#1c261f] hover:border-white/20"
+                        }`}
+                      >
+                        {/* Avatar */}
+                        <div className="relative w-9 h-9 rounded-full overflow-hidden flex-shrink-0 border border-white/10">
+                          <Image
+                            src={member.imageUrl}
+                            alt={member.name}
+                            fill
+                            className="object-cover object-top"
+                          />
+                        </div>
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <p className={`font-semibold text-[12px] truncate leading-tight ${isSelected ? "text-white" : "text-white/80"}`}>
+                            {member.name}
+                          </p>
+                          <p className="text-[10px] text-white/40 truncate leading-tight mt-0.5">
+                            {member.role}
+                          </p>
+                        </div>
+                        {/* Check indicator */}
+                        <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-all ${
+                          isSelected ? "bg-primary border-primary" : "border-white/20"
+                        }`}>
+                          {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
 
           <div>
             <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
@@ -238,14 +399,14 @@ export default function ProjectFormModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-lg border border-white/10 text-white/70 hover:text-white text-xs font-semibold uppercase tracking-wider"
+              className="px-5 py-2.5 rounded-lg border border-white/10 text-white/70 hover:text-white text-xs font-semibold uppercase tracking-wider cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2"
+              className="px-6 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Publish Project"}
             </button>

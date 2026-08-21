@@ -2,14 +2,80 @@ import React from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { db } from "@/db";
-import { projects } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { projects, teamMembers as teamMembersTable } from "@/db/schema";
+import { eq, inArray } from "drizzle-orm";
 import ProjectDetailClient, { ProjectDetailData } from "./ProjectDetailClient";
 
 export const revalidate = 0;
 
 // Curated project details fallback dictionary for prominent projects
 const fallbackProjects: Record<string, Partial<ProjectDetailData>> = {
+  "1-kanal-modern-villa": {
+    title: "1 Kanal Modern Residence",
+    category: "Residential Architecture",
+    location: "Lahore, Pakistan",
+    year: "2024",
+    area: "5,000 SQ FT",
+    plotSize: "1 Kanal",
+    tagline: "Bold Geometry. Seamless Indoor-Outdoor Flow.",
+    description:
+      "A contemporary luxury residence characterized by double-height volumes, expansive glazing, and private landscaped courtyard gardens.",
+    coverImage: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=85",
+    scopeOfWork: ["Architectural Design", "Interior Architecture", "Landscape Design"],
+    status: "Completed",
+    gallery: [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=85",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1000&q=85",
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1000&q=85",
+      "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800&q=80",
+      "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&q=80",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80",
+      "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&q=80",
+      "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800&q=80",
+      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80",
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80",
+      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80",
+    ],
+  },
+  "luxury-apartment-interior": {
+    title: "Luxury Apartment Interior",
+    category: "Interior Design",
+    location: "Islamabad, Pakistan",
+    year: "2024",
+    area: "2,450 SQ FT",
+    tagline: "Contemporary Elegance. Timeless Comfort.",
+    description:
+      "This luxury apartment interior is a perfect blend of sophistication, warmth and functionality. Every detail from material selection to lighting is crafted to create a refined living experience.",
+    coverImage: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1600&q=85",
+    overviewText1:
+      "The apartment interior is designed with a focus on open spaces, natural light, and a refined material palette. The design combines modern aesthetics with functional layouts to create a serene and luxurious home environment.",
+    overviewText2:
+      "Neutral tones, premium finishes, layered lighting, and custom furniture come together to deliver a cohesive and timeless interior experience.",
+    scopeOfWork: ["Concept Design", "Interior Design", "FF&E", "Lighting Design"],
+    status: "Completed",
+    gallery: [
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1600&q=85",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1000&q=80",
+      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1000&q=80",
+      "https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?w=1000&q=80",
+      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1000&q=80",
+      "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1000&q=80",
+      "https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=1000&q=80",
+      "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&q=80",
+      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80",
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80",
+      "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800&q=80",
+    ],
+    featureBedroomImage: "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&q=80",
+    features: [
+      "Spacious open-plan living and dining area",
+      "Custom joinery and premium finishes",
+      "Layered lighting for ambiance and functionality",
+      "Elegant neutral color palette with natural textures",
+      "High-end furniture and curated décor",
+      "Large windows for natural light and views",
+    ],
+  },
   "g8-building-supervision": {
     title: "Cantt Heights",
     category: "Construction Supervision",
@@ -91,10 +157,6 @@ const fallbackProjects: Record<string, Partial<ProjectDetailData>> = {
     description:
       "A sustainable green belt initiative designed to improve urban ecology, promote biodiversity and create healthier, more livable communities.",
     coverImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=85",
-    overviewText1:
-      "The Green Belt Development is an urban landscape initiative that creates a continuous green corridor to enhance environmental quality and community well-being.",
-    overviewText2:
-      "Spanning 5.2 KM, the project integrates walking and cycling tracks, native planting, public gathering spaces and sustainable infrastructure to promote a greener and healthier city.",
     scopeOfWork: [
       "Masterplan",
       "Landscape Design",
@@ -112,8 +174,6 @@ const fallbackProjects: Record<string, Partial<ProjectDetailData>> = {
       "Enhanced biodiversity and microclimate",
       "Safe, accessible and inclusive design",
     ],
-    conceptText:
-      "The concept is inspired by the natural landscape and local context, creating a green spine that connects people with nature while promoting sustainability and eco-friendly living.",
     gallery: [
       "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=85",
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1000&q=80",
@@ -122,55 +182,6 @@ const fallbackProjects: Record<string, Partial<ProjectDetailData>> = {
       "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1000&q=80",
       "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1000&q=80",
     ],
-  },
-  "cantt-beautification-peshawar": {
-    title: "Cantt Beautification Project",
-    category: "Landscape Design",
-    location: "Peshawar Cantonment",
-    year: "2025",
-    area: "12 Acres",
-    length: "3.5 KM",
-    plantation: "8,000+ Native Plants",
-    tagline: "Transforming Public Urban Spaces.",
-    description:
-      "Large-scale public landscape and urban design project creating pedestrian promenades, green corridors, and civic park zones.",
-    coverImage: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1920&q=85",
-    overviewText1:
-      "An urban revitalization project designed to upgrade civic spaces, integrate modern street furniture, native vegetation, and pedestrian-first infrastructure.",
-    overviewText2:
-      "Creating vibrant civic corridors that enhance community wellbeing and beautify the historical Peshawar Cantonment district.",
-    scopeOfWork: ["Urban Design", "Landscape Architecture", "Public Amenities", "Lighting Design"],
-    status: "Completed (2025)",
-  },
-  "peshawar-cantonment-beautification": {
-    title: "Peshawar Cantt Beautification",
-    category: "Landscape Design",
-    location: "Peshawar Cantonment",
-    year: "2025",
-    area: "12 Acres",
-    length: "3.5 KM",
-    plantation: "8,000+ Native Plants",
-    tagline: "Transforming Public Urban Spaces.",
-    description:
-      "Large-scale public landscape and urban design project creating pedestrian promenades, green corridors, and civic park zones.",
-    coverImage: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1920&q=85",
-    scopeOfWork: ["Urban Design", "Landscape Architecture", "Public Amenities", "Lighting Design"],
-    status: "Completed (2025)",
-  },
-  "green-belt-master-plan": {
-    title: "Green Belt Master Plan",
-    category: "Landscape Design",
-    location: "Peshawar, Pakistan",
-    year: "2025",
-    area: "125 Acres",
-    length: "5.2 KM",
-    plantation: "10,000+ Trees",
-    tagline: "Connecting Nature. Enhancing Life.",
-    description:
-      "Master planning for a 5.2km green belt corridor integrating ecological corridors, cycling tracks, and community pavilions.",
-    coverImage: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=85",
-    scopeOfWork: ["Master Planning", "Ecology Study", "Landscape Design", "Community Spaces"],
-    status: "Completed (2025)",
   },
   "project-management-services": {
     title: "Project Management Services",
@@ -186,10 +197,6 @@ const fallbackProjects: Record<string, Partial<ProjectDetailData>> = {
     description:
       "We managed the complete project lifecycle of this 1 Kanal residence from planning to handover, ensuring quality, timely delivery and cost efficiency at every stage.",
     coverImage: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=85",
-    overviewText1:
-      "Fanoon Consultants was entrusted with the end-to-end project management of this 1 Kanal residence. Our role included planning, coordination, procurement supervision, quality control, budget management and timely execution to bring the client's vision to life.",
-    overviewText2:
-      "Through proactive communication and rigorous site management, we ensured a smooth construction process, maintaining high standards of quality, safety and efficiency.",
     scopeOfWork: [
       "Project Planning & Scheduling",
       "Cost Management & Budgeting",
@@ -211,83 +218,48 @@ const fallbackProjects: Record<string, Partial<ProjectDetailData>> = {
       "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1000&q=80",
       "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1000&q=80",
     ],
-    hardHatImage: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80",
   },
-  "luxury-apartment-interior": {
-    title: "Luxury Apartment Interior",
-    category: "Interior Design",
-    location: "Islamabad",
+  "10-marla-modern-residence": {
+    title: "10 Marla Modern Residence",
+    category: "3D Visualization",
+    location: "Lahore, Pakistan",
     year: "2024",
-    area: "2,450 SQ FT",
-    tagline: "Contemporary Elegance. Timeless Comfort.",
+    area: "3,200 SQ FT",
+    plotSize: "10 Marla",
+    floors: "G+1",
+    scope: "Exterior Visualization",
+    tagline: "Realistic. Detailed. Inspiring.",
     description:
-      "This luxury apartment interior is a perfect blend of sophistication, warmth and functionality. Every detail from material selection to lighting is crafted to create a refined living experience.",
-    coverImage: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1600&q=85",
+      "These exterior visualizations present a modern residence design with a perfect blend of contemporary architecture, premium materials and lush landscaping. Every angle is crafted to showcase the beauty of design before it's built.",
     overviewText1:
-      "The apartment interior is designed with a focus on open spaces, natural light, and a refined material palette. The design combines modern aesthetics with functional layouts to create a serene and luxurious home environment.",
-    overviewText2:
-      "Neutral tones, premium finishes, layered lighting, and custom furniture come together to deliver a cohesive and timeless interior experience.",
-    scopeOfWork: ["Concept Design", "Interior Design", "FF&E", "Lighting Design"],
-    status: "Completed",
-    gallery: [
-      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1600&q=85",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1000&q=80",
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1000&q=80",
-      "https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?w=1000&q=80",
-      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1000&q=80",
-      "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1000&q=80",
-      "https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=1000&q=80",
+      "This 10 Marla modern residence is designed with clean lines, balanced proportions and a harmonious combination of textures. The design emphasizes natural light, open spaces and a strong connection between indoor and outdoor living.",
+    coverImage: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=85",
+    scopeOfWork: [
+      "3D Exterior Rendering",
+      "Day & Night Views",
+      "Elevation Renders",
+      "Material Detailing",
+      "Landscape Visuals",
     ],
-    featureBedroomImage: "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&q=80",
+    status: "Completed (2024)",
     features: [
-      "Spacious open-plan living and dining area",
-      "Custom joinery and premium finishes",
-      "Layered lighting for ambiance and functionality",
-      "Elegant neutral color palette with natural textures",
-      "High-end furniture and curated décor",
-      "Large windows for natural light and views",
+      "Modern Architecture",
+      "Premium Materials",
+      "Lush Landscaping",
+      "Realistic Lighting & Shadows",
+      "High Quality Rendering",
+      "Multiple Views & Angles",
     ],
-    conceptText:
-      "The concept revolves around creating a calm, elegant and inviting home that reflects the client's lifestyle. The design emphasizes spatial flow, natural materials and bespoke details.",
-  },
-  "cantt-heights": {
-    title: "Cantt Heights",
-    category: "Architecture",
-    location: "Peshawar Cantonment",
-    year: "2024",
-    area: "45,000 SQ FT",
-    tagline: "Modern Vertical Living & Commercial Landmark.",
-    description:
-      "A G+6 mixed-use development combining high-end retail, corporate offices, and luxury residential apartments designed for seamless urban integration.",
-    coverImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600&q=85",
-    scopeOfWork: ["Architectural Design", "Structural Coordination", "MEP", "Site Supervision"],
-    status: "Completed",
-  },
-  "green-heights": {
-    title: "Green Heights",
-    category: "Architecture",
-    location: "Peshawar",
-    year: "2023",
-    area: "38,000 SQ FT",
-    tagline: "Eco-Friendly High-Rise with Dynamic Facade.",
-    description:
-      "Sustainable residential building incorporating natural ventilation, green terraces, and solar-optimized building envelopes.",
-    coverImage: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1600&q=85",
-    scopeOfWork: ["Architectural Design", "Façade Engineering", "Interior Design"],
-    status: "Completed",
-  },
-  "1-kanal-modern-villa": {
-    title: "1 Kanal Modern Villa",
-    category: "Architecture",
-    location: "Lahore",
-    year: "2024",
-    area: "5,000 SQ FT",
-    tagline: "Bold Geometry. Seamless Indoor-Outdoor Flow.",
-    description:
-      "A contemporary luxury residence characterized by double-height volumes, expansive glazing, and private landscaped courtyard gardens.",
-    coverImage: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1600&q=85",
-    scopeOfWork: ["Architectural Design", "Interior Architecture", "Landscape Design"],
-    status: "Completed",
+    gallery: [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=85",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=85",
+      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=85",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=85",
+      "https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?w=1200&q=85",
+      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=85",
+      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=85",
+    ],
   },
 };
 
@@ -355,50 +327,105 @@ export default async function ProjectDetailPage({
       const p = rows[0];
       const fallback = fallbackProjects[slug] || fallbackProjects[p.slug] || {};
 
+      // Parse gallery images uploaded by admin
+      let dbGallery: string[] = [];
+      if (p.galleryImages) {
+        try {
+          const parsed = JSON.parse(p.galleryImages);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            dbGallery = parsed.filter((img) => typeof img === "string" && img.trim().length > 0);
+          }
+        } catch {}
+      }
+
+      // Parse selected team member IDs
+      let selectedTeamIds: string[] = [];
+      if (p.teamMembers) {
+        try {
+          const parsed = JSON.parse(p.teamMembers);
+          if (Array.isArray(parsed)) {
+            selectedTeamIds = parsed.filter((id) => typeof id === "string" && id.trim().length > 0);
+          }
+        } catch {}
+      }
+
+      // Fetch real team member rows for selected IDs
+      let selectedTeamData: { id: string; name: string; role: string; imageUrl: string; socialLink: string | null; description: string | null }[] = [];
+      if (selectedTeamIds.length > 0) {
+        try {
+          selectedTeamData = await db
+            .select({
+              id: teamMembersTable.id,
+              name: teamMembersTable.name,
+              role: teamMembersTable.role,
+              imageUrl: teamMembersTable.imageUrl,
+              socialLink: teamMembersTable.socialLink,
+              description: teamMembersTable.description,
+            })
+            .from(teamMembersTable)
+            .where(inArray(teamMembersTable.id, selectedTeamIds));
+        } catch {}
+      }
+
+      // Build unified list of real images uploaded by admin
+      const realImages: string[] = [];
+      if (p.coverImage && p.coverImage.trim().length > 0) {
+        realImages.push(p.coverImage);
+      }
+      for (const img of dbGallery) {
+        if (!realImages.includes(img)) {
+          realImages.push(img);
+        }
+      }
+
+      const hasUploadedImages = realImages.length > 0;
+
       projectData = {
         id: p.id,
         slug: p.slug,
-        title: fallback.title || p.title,
-        category: p.category,
+        title: p.title || fallback.title || "Project",
+        category: p.category || fallback.category || "Architecture",
         client: p.client || fallback.client || "Private Client",
-        location: p.location || fallback.location || "Peshawar Cantonment",
+        location: p.location || fallback.location || "Lahore, Pakistan",
         year: p.year || fallback.year || "2024",
-        area: fallback.area || (p.category.toLowerCase().includes("supervision") ? "Approx. 180,000 SQ FT" : p.category.toLowerCase().includes("landscape") ? "Approx. 125 Acres" : p.category.toLowerCase().includes("interior") ? "2,450 SQ FT" : "7,200 SQ FT"),
-        length: fallback.length || (p.category.toLowerCase().includes("landscape") ? "5.2 KM" : undefined),
-        plantation: fallback.plantation || (p.category.toLowerCase().includes("landscape") ? "10,000+ Trees & Shrubs" : undefined),
-        plotArea: fallback.plotArea || (p.category.toLowerCase().includes("supervision") ? "23,500 SQ FT" : undefined),
+        area: fallback.area || (p.category.toLowerCase().includes("supervision") ? "Approx. 180,000 SQ FT" : p.category.toLowerCase().includes("landscape") ? "Approx. 125 Acres" : p.category.toLowerCase().includes("interior") ? "2,450 SQ FT" : "5,000 SQ FT"),
+        length: fallback.length,
+        plantation: fallback.plantation,
+        plotArea: fallback.plotArea,
         plotSize: fallback.plotSize || "1 Kanal",
-        use: fallback.use || (p.category.toLowerCase().includes("supervision") ? "Shops, Offices, Apartments" : undefined),
-        structure: fallback.structure || (p.category.toLowerCase().includes("supervision") ? "RCC Framed Structure" : undefined),
-        floors: fallback.floors || (p.category.toLowerCase().includes("supervision") ? "G+6 (Basement + Ground + 6)" : undefined),
-        commencement: fallback.commencement || (p.category.toLowerCase().includes("supervision") ? "January 2023" : undefined),
-        completion: fallback.completion || (p.category.toLowerCase().includes("supervision") ? "December 2024" : undefined),
-        duration: fallback.duration || (p.category.toLowerCase().includes("supervision") ? "22 Months" : "10 Months"),
+        use: fallback.use,
+        structure: fallback.structure,
+        floors: fallback.floors,
+        commencement: fallback.commencement,
+        completion: fallback.completion,
+        duration: fallback.duration || "10 Months",
         constructionType: fallback.constructionType || "New Construction",
         contractType: fallback.contractType || p.category,
-        coverImage: p.coverImage || fallback.coverImage || "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=85",
+        coverImage: p.coverImage || fallback.coverImage || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=85",
         description: p.description || fallback.description,
-        tagline: fallback.tagline || (p.category.toLowerCase().includes("supervision") ? "G+6 Mixed-Use Development" : p.category.toLowerCase().includes("landscape") ? "Connecting Nature. Enhancing Life." : `${p.category} Excellence & Modern Innovation`),
-        tagline2: fallback.tagline2 || (p.category.toLowerCase().includes("supervision") ? "Supervision You Can Trust. Quality You Can See." : undefined),
+        tagline: fallback.tagline || (p.category.toLowerCase().includes("supervision") ? "G+6 Mixed-Use Development" : `${p.category} Excellence & Modern Innovation`),
+        tagline2: fallback.tagline2,
         scopeOfWork: fallback.scopeOfWork || [
-          "Review of shop drawings and material submittals",
-          "Verification of setting out and dimensional accuracy",
-          "Monitoring of quality of materials and workmanship",
-          "Inspection of structural works at all stages",
-          "Coordination with MEP and other consultants",
-          "Monitoring of progress against approved schedule",
-          "Site meetings, reporting and documentation",
-          "Ensuring compliance with safety regulations",
+          "Concept Design",
+          "Architectural Drawings",
+          "Interior Detailing",
+          "Site Supervision",
         ],
         status: fallback.status || "Completed (2024)",
         siteProgressStages: fallback.siteProgressStages,
-        gallery: fallback.gallery || [
+        // Strictly use real images uploaded by admin whenever available
+        gallery: hasUploadedImages ? realImages : fallback.gallery || [
           p.coverImage,
-          "https://images.unsplash.com/photo-1541888946425-d0fbb18f13f7?w=1000&q=80",
-          "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1000&q=80",
-          "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1000&q=80",
-          "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1000&q=80",
-          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1000&q=80",
+          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1000&q=85",
+          "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1000&q=85",
+          "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800&q=80",
+          "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&q=80",
+          "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80",
+          "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&q=80",
+          "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800&q=80",
+          "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80",
+          "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80",
+          "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80",
         ],
         features: fallback.features,
         conceptText: fallback.conceptText,
@@ -406,6 +433,7 @@ export default async function ProjectDetailPage({
         overviewText2: fallback.overviewText2,
         featureBedroomImage: fallback.featureBedroomImage,
         hardHatImage: fallback.hardHatImage,
+        selectedTeam: selectedTeamData.length > 0 ? selectedTeamData : undefined,
       };
     }
   } catch (err) {
@@ -421,30 +449,21 @@ export default async function ProjectDetailPage({
         title: fallback.title,
         category: fallback.category,
         client: fallback.client || "Private Client",
-        location: fallback.location || "Peshawar Cantonment",
+        location: fallback.location || "Lahore, Pakistan",
         year: fallback.year || "2024",
-        area: fallback.area || "Approx. 180,000 SQ FT",
-        plotArea: fallback.plotArea || "23,500 SQ FT",
-        use: fallback.use || "Shops, Offices, Apartments",
-        structure: fallback.structure || "RCC Framed Structure",
-        floors: fallback.floors || "G+6 (Basement + Ground + 6)",
-        commencement: fallback.commencement || "January 2023",
-        completion: fallback.completion || "December 2024",
-        duration: fallback.duration || "22 Months",
+        area: fallback.area || "5,000 SQ FT",
+        plotSize: fallback.plotSize || "1 Kanal",
         coverImage: fallback.coverImage,
         description: fallback.description,
         tagline: fallback.tagline,
-        tagline2: fallback.tagline2,
         scopeOfWork: fallback.scopeOfWork,
-        status: fallback.status || "Completed (2024)",
-        siteProgressStages: fallback.siteProgressStages,
+        status: fallback.status || "Completed",
         gallery: fallback.gallery,
         features: fallback.features,
         conceptText: fallback.conceptText,
         overviewText1: fallback.overviewText1,
         overviewText2: fallback.overviewText2,
         featureBedroomImage: fallback.featureBedroomImage,
-        hardHatImage: fallback.hardHatImage,
       };
     } else {
       const formattedTitle = slug
@@ -455,37 +474,16 @@ export default async function ProjectDetailPage({
       projectData = {
         slug,
         title: formattedTitle,
-        category: "Construction Supervision",
+        category: "Residential Architecture",
         client: "Private Client",
-        location: "Peshawar Cantonment",
+        location: "Lahore, Pakistan",
         year: "2024",
-        area: "Approx. 180,000 SQ FT",
-        plotArea: "23,500 SQ FT",
-        use: "Shops, Offices, Apartments",
-        structure: "RCC Framed Structure",
-        floors: "G+6 (Basement + Ground + 6)",
-        commencement: "January 2023",
-        completion: "December 2024",
-        duration: "22 Months",
-        coverImage: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=85",
-        tagline: "G+6 Mixed-Use Development",
-        tagline2: "Supervision You Can Trust. Quality You Can See.",
+        area: "5,000 SQ FT",
+        plotSize: "1 Kanal",
+        coverImage: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=85",
+        tagline: "1 Kanal Modern Residence",
         description:
-          "Fanoon Consultants provided complete construction supervision services, ensuring the project was executed in strict accordance with the approved design, specifications, quality standards and project timeline.",
-        overviewText1:
-          "Our team was responsible for end-to-end construction supervision to ensure the highest standards of workmanship, material quality and compliance with drawings and specifications.",
-        overviewText2:
-          "Our team worked closely with the contractor and all stakeholders to monitor every activity on site, mitigate risks and deliver a safe, timely and high-quality project.",
-        scopeOfWork: [
-          "Review of shop drawings and material submittals",
-          "Verification of setting out and dimensional accuracy",
-          "Monitoring of quality of materials and workmanship",
-          "Inspection of structural works at all stages",
-          "Coordination with MEP and other consultants",
-          "Monitoring of progress against approved schedule",
-          "Site meetings, reporting and documentation",
-          "Ensuring compliance with safety regulations",
-        ],
+          "An exceptional architectural and interior design project executed with precision, timeless aesthetics, and sustainable construction practices.",
         status: "Completed (2024)",
       };
     }

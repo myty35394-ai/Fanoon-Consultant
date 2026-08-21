@@ -64,6 +64,8 @@ export const projects = pgTable("projects", {
   location: text("location"),
   year: text("year"),
   coverImage: text("cover_image").notNull(),
+  galleryImages: text("gallery_images").default("[]"), // JSON array of up to 5 uploaded gallery image URLs
+  teamMembers: text("team_members").default("[]"), // JSON array of selected team member IDs
   description: text("description"),
   featured: boolean("featured").default(false),
   isArsalan: boolean("is_arsalan").default(false),
