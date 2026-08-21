@@ -19,7 +19,31 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { title, category, client, location, year, coverImage, galleryImages, teamMembers, description, featured, isArsalan, tagline, plotSize, area, floors, scope, status } = body;
+    const {
+      title,
+      category,
+      client,
+      location,
+      year,
+      coverImage,
+      galleryImages,
+      drawingImages,
+      teamMembers,
+      description,
+      featured,
+      isArsalan,
+      tagline,
+      plotSize,
+      area,
+      floors,
+      scope,
+      status,
+      duration,
+      structure,
+      constructionType,
+      materialsData,
+      spaceNames,
+    } = body;
 
     if (!title || !category || !coverImage) {
       return NextResponse.json(
@@ -44,7 +68,8 @@ export async function POST(req: Request) {
         location: location || null,
         year: year || new Date().getFullYear().toString(),
         coverImage,
-        galleryImages: Array.isArray(galleryImages) ? JSON.stringify(galleryImages) : typeof galleryImages === "string" ? galleryImages : "[]",
+        galleryImages: Array.isArray(galleryImages) ? JSON.stringify(galleryImages.slice(0, 5)) : typeof galleryImages === "string" ? galleryImages : "[]",
+        drawingImages: Array.isArray(drawingImages) ? JSON.stringify(drawingImages.slice(0, 3)) : typeof drawingImages === "string" ? drawingImages : "[]",
         teamMembers: Array.isArray(teamMembers) ? JSON.stringify(teamMembers) : typeof teamMembers === "string" ? teamMembers : "[]",
         description: description || null,
         tagline: tagline || null,
@@ -53,6 +78,11 @@ export async function POST(req: Request) {
         floors: floors || null,
         scope: scope || null,
         status: status || null,
+        duration: duration || null,
+        structure: structure || null,
+        constructionType: constructionType || null,
+        materialsData: materialsData ? (typeof materialsData === "string" ? materialsData : JSON.stringify(materialsData)) : null,
+        spaceNames: Array.isArray(spaceNames) ? JSON.stringify(spaceNames.slice(0, 5)) : typeof spaceNames === "string" ? spaceNames : "[]",
         featured: Boolean(featured),
         isArsalan: Boolean(isArsalan),
       })

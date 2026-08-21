@@ -112,7 +112,7 @@ const fallbackProjects: Record<string, Partial<ProjectDetailData>> = {
     siteProgressStages: [
       {
         title: "Excavation",
-        image: "https://images.unsplash.com/photo-1541888946425-d0fbb18f13f7?w=600&q=80",
+        image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",
       },
       {
         title: "Foundation Works",
@@ -137,7 +137,7 @@ const fallbackProjects: Record<string, Partial<ProjectDetailData>> = {
     ],
     gallery: [
       "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=85",
-      "https://images.unsplash.com/photo-1541888946425-d0fbb18f13f7?w=1000&q=80",
+      "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1000&q=80",
       "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1000&q=80",
       "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1000&q=80",
       "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1000&q=80",
@@ -338,6 +338,17 @@ export default async function ProjectDetailPage({
         } catch {}
       }
 
+      // Parse drawing images uploaded by admin
+      let dbDrawings: string[] = [];
+      if (p.drawingImages) {
+        try {
+          const parsed = JSON.parse(p.drawingImages);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            dbDrawings = parsed.filter((img) => typeof img === "string" && img.trim().length > 0);
+          }
+        } catch {}
+      }
+
       // Parse selected team member IDs
       let selectedTeamIds: string[] = [];
       if (p.teamMembers) {
@@ -373,7 +384,7 @@ export default async function ProjectDetailPage({
         realImages.push(p.coverImage);
       }
       for (const img of dbGallery) {
-        if (!realImages.includes(img)) {
+        if (img && typeof img === "string" && img.trim().length > 0 && !realImages.includes(img)) {
           realImages.push(img);
         }
       }
@@ -394,13 +405,12 @@ export default async function ProjectDetailPage({
         plotArea: fallback.plotArea,
         plotSize: p.plotSize || fallback.plotSize || "",
         floors: p.floors || fallback.floors || "",
-        scope: p.scope || fallback.scope || "",
         use: fallback.use,
-        structure: fallback.structure,
+        structure: p.structure || fallback.structure,
         commencement: fallback.commencement,
         completion: fallback.completion,
-        duration: fallback.duration || "10 Months",
-        constructionType: fallback.constructionType || "New Construction",
+        duration: p.duration || fallback.duration || "10 Months",
+        constructionType: p.constructionType || fallback.constructionType || "New Construction",
         contractType: fallback.contractType || p.category,
         coverImage: p.coverImage || fallback.coverImage || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=85",
         description: p.description || fallback.description,
@@ -434,7 +444,16 @@ export default async function ProjectDetailPage({
         overviewText2: fallback.overviewText2,
         featureBedroomImage: fallback.featureBedroomImage,
         hardHatImage: fallback.hardHatImage,
+        drawingImages: dbDrawings.length > 0 ? dbDrawings : fallback.drawingImages || undefined,
         selectedTeam: selectedTeamData.length > 0 ? selectedTeamData : undefined,
+        spaceNames: (() => {
+          if (!p.spaceNames) return [];
+          try { return JSON.parse(p.spaceNames); } catch { return []; }
+        })(),
+        materialsData: (() => {
+          if (!p.materialsData) return undefined;
+          try { return JSON.parse(p.materialsData); } catch { return undefined; }
+        })(),
       };
     }
   } catch (err) {

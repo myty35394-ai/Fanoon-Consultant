@@ -102,6 +102,7 @@ export interface ProjectDetailData {
   scopeOfWork?: string[];
   status?: string;
   gallery?: string[];
+  drawingImages?: string[];
   features?: string[];
   conceptPillars?: { title: string; desc?: string }[];
   conceptText?: string;
@@ -111,6 +112,18 @@ export interface ProjectDetailData {
   hardHatImage?: string;
   siteProgressStages?: { title: string; image: string }[];
   selectedTeam?: SelectedTeamMember[];
+  materialsData?: {
+    concept?: string;
+    quote?: string;
+    exteriorFinishes?: string[];
+    interiorFloors?: string[];
+    interiorWalls?: string[];
+    ceilingLighting?: string[];
+    joineryMillwork?: string[];
+    metalGlass?: string[];
+    sustainableChoices?: string[];
+  };
+  spaceNames?: string[];
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -726,19 +739,10 @@ export default function ProjectDetailClient({ project }: { project: ProjectDetai
      1. RENDER: 3D VISUALIZATION VARIANT
      ───────────────────────────────────────────────────────────── */
   if (is3DVisualization) {
-    const curated3DImages = [
-      ...(galleryList && galleryList.length > 0 ? galleryList : []),
-      project.coverImage || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1600&q=85",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85",
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=85",
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=85",
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=85",
-      "https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?w=1200&q=85",
-      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=85",
-      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=85",
-    ].filter((v, i, a) => v && typeof v === "string" && a.indexOf(v) === i);
+    const curated3DImages = galleryList && galleryList.length > 0
+      ? galleryList
+      : defaultFallbackGallery;
 
-    const eightGalleryImages = curated3DImages.slice(0, 8);
 
     return (
       <>
@@ -960,14 +964,14 @@ export default function ProjectDetailClient({ project }: { project: ProjectDetai
                   </div>
                 </div>
 
-                {/* Large Showcase Render */}
-                <div className="lg:col-span-7">
+                {/* Large Showcase Render & Thumbnails */}
+                <div className="lg:col-span-7 space-y-4">
                   <div
-                    onClick={() => setLightboxImage(curated3DImages[0] || project.coverImage)}
+                    onClick={() => setLightboxImage(activeOverviewImage)}
                     className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden shadow-md cursor-pointer group border border-black/5"
                   >
                     <Image
-                      src={curated3DImages[0] || project.coverImage}
+                      src={activeOverviewImage}
                       alt={project.title}
                       fill
                       className="object-cover group-hover:scale-103 transition-transform duration-500"
@@ -978,6 +982,31 @@ export default function ProjectDetailClient({ project }: { project: ProjectDetai
                       </span>
                     </div>
                   </div>
+
+                  {/* Thumbnail Strip */}
+                  {galleryList.length > 1 && (
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3">
+                      {galleryList.map((img, idx) => {
+                        const isSelected = activeOverviewImage === img;
+                        return (
+                          <div
+                            key={idx}
+                            onClick={() => setActiveOverviewImage(img)}
+                            className={`relative aspect-[4/3] rounded-lg overflow-hidden cursor-pointer group shadow-xs border transition-all ${
+                              isSelected ? "ring-2 ring-primary border-transparent scale-98" : "border-black/10 hover:border-primary/50"
+                            }`}
+                          >
+                            <Image
+                              src={img}
+                              alt={`${project.title} thumbnail ${idx + 1}`}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1015,19 +1044,25 @@ export default function ProjectDetailClient({ project }: { project: ProjectDetai
                     onClick={() => handleTabClick("GALLERY")}
                     className="bg-[#0a0f0c] hover:bg-primary text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 flex-shrink-0 cursor-pointer self-end xl:self-center"
                   >
-                    <span>+{Math.max(curated3DImages.length, 12)} More Images</span>
+                    <span>+{galleryList.length} Gallery Photos</span>
                   </button>
                 </div>
               </div>
 
-              {/* Section 3: Exterior Visualization Gallery (8 cards) */}
+              {/* Section 3: Exterior Visualization Gallery */}
               <div className="space-y-6 pt-2">
                 <h3 className="text-2xl font-bold text-charcoal tracking-tight">
                   Exterior Visualization Gallery
                 </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
-                  {eightGalleryImages.map((img, i) => (
+                <div className={`grid gap-4 md:gap-5 ${
+                  galleryList.length === 1 ? "grid-cols-1" :
+                  galleryList.length === 2 ? "grid-cols-1 sm:grid-cols-2" :
+                  galleryList.length === 3 ? "grid-cols-1 sm:grid-cols-3" :
+                  galleryList.length === 4 ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-4" :
+                  "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
+                }`}>
+                  {galleryList.map((img, i) => (
                     <div
                       key={i}
                       onClick={() => setLightboxImage(img)}
@@ -1061,8 +1096,14 @@ export default function ProjectDetailClient({ project }: { project: ProjectDetai
                 <div className="w-10 h-[3px] bg-primary rounded-full mt-1.5" />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                {curated3DImages.map((img, i) => (
+              <div className={`grid gap-4 md:gap-6 ${
+                galleryList.length === 1 ? "grid-cols-1 max-w-3xl" :
+                galleryList.length === 2 ? "grid-cols-1 sm:grid-cols-2" :
+                galleryList.length === 3 ? "grid-cols-1 sm:grid-cols-3" :
+                galleryList.length === 4 ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-4" :
+                "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
+              }`}>
+                {galleryList.map((img, i) => (
                   <div
                     key={i}
                     onClick={() => setLightboxImage(img)}
@@ -1235,7 +1276,7 @@ export default function ProjectDetailClient({ project }: { project: ProjectDetai
     const defaultStages = [
       {
         title: "Excavation",
-        image: "https://images.unsplash.com/photo-1541888946425-d0fbb18f13f7?w=600&q=80",
+        image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",
       },
       {
         title: "Foundation Works",
@@ -2481,60 +2522,114 @@ export default function ProjectDetailClient({ project }: { project: ProjectDetai
         {activeTab === "DRAWINGS" && (
           <div className="space-y-10 py-14">
             <div className="text-center max-w-2xl mx-auto space-y-2">
-              <h2 className="text-2xl md:text-3xl font-bold text-charcoal">Architectural Drawings & Plans</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-charcoal">
+                {isLandscape ? "Landscape Masterplans & Drawings" : `${project.category} Drawings & Plans`}
+              </h2>
               <p className="text-dark-gray/70 text-xs md:text-sm">
-                Technical 2D/3D architectural elevations, ground floor blueprints, and spatial section layouts.
+                Technical layout schematics, floor plans, sections, and detailed elevations for {project.title}.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {[
-                {
-                  title: "Ground Floor Architectural Plan",
-                  desc: "Zoning, spatial flow, double-height living areas and courtyard integration.",
-                  image: galleryList[0] || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1000&q=80",
-                },
-                {
-                  title: "First Floor & Master Suite Layout",
-                  desc: "Private family lounge, terraces, ensuite bathrooms, and walk-in wardrobe allocations.",
-                  image: galleryList[1] || galleryList[0] || "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1000&q=80",
-                },
-                {
-                  title: "Front & Rear Facade Elevations",
-                  desc: "Material treatment, louvre details, dynamic cantilever projections, and glass curtain wall dimensions.",
-                  image: galleryList[2] || galleryList[0] || "https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?w=1000&q=80",
-                },
-                {
-                  title: "Cross Section & Structural Framing",
-                  desc: "Slab heights, RCC column layout, foundation depth, and staircase detailing.",
-                  image: galleryList[3] || galleryList[0] || "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1000&q=80",
-                },
-              ].map((dwg, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white border border-[#e5e5e5] rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-shadow group"
-                >
+            {project.drawingImages && project.drawingImages.length > 0 ? (
+              /* Real Uploaded Drawing Images (Up to 3) */
+              <div className={`grid gap-6 md:gap-8 ${
+                project.drawingImages.length === 1
+                  ? "grid-cols-1 max-w-3xl mx-auto"
+                  : project.drawingImages.length === 2
+                  ? "grid-cols-1 md:grid-cols-2"
+                  : "grid-cols-1 md:grid-cols-3"
+              }`}>
+                {project.drawingImages.map((img, idx) => {
+                  const defaultTitles = [
+                    "Plan & Spatial Layout",
+                    "Elevation & Section Drawing",
+                    "Technical Schematic & Details",
+                  ];
+                  return (
+                    <div
+                      key={idx}
+                      className="bg-white border border-[#e5e5e5] rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-shadow group"
+                    >
+                      <div
+                        onClick={() => setLightboxImage(img)}
+                        className="relative aspect-[16/10] bg-[#0d1410] overflow-hidden cursor-pointer"
+                      >
+                        <Image
+                          src={img}
+                          alt={`Drawing ${idx + 1} - ${project.title}`}
+                          fill
+                          className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-103 transition-all duration-300"
+                        />
+                        <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                          <ZoomIn className="w-3 h-3 text-primary" /> View Drawing
+                        </div>
+                      </div>
+                      <div className="p-5 space-y-1">
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-primary block">
+                          Drawing #{idx + 1}
+                        </span>
+                        <h4 className="font-bold text-charcoal text-sm">
+                          {defaultTitles[idx] || `Technical Plan ${idx + 1}`}
+                        </h4>
+                        <p className="text-dark-gray/70 text-xs">
+                          Detailed drawing and design specifications for {project.title}.
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              /* Fallback Drawings */
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {[
+                  {
+                    title: "Ground Floor Architectural Plan",
+                    desc: "Zoning, spatial flow, double-height living areas and courtyard integration.",
+                    image: galleryList[0] || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1000&q=80",
+                  },
+                  {
+                    title: "First Floor & Master Suite Layout",
+                    desc: "Private family lounge, terraces, ensuite bathrooms, and walk-in wardrobe allocations.",
+                    image: galleryList[1] || galleryList[0] || "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1000&q=80",
+                  },
+                  {
+                    title: "Front & Rear Facade Elevations",
+                    desc: "Material treatment, louvre details, dynamic cantilever projections, and glass curtain wall dimensions.",
+                    image: galleryList[2] || galleryList[0] || "https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?w=1000&q=80",
+                  },
+                  {
+                    title: "Cross Section & Structural Framing",
+                    desc: "Slab heights, RCC column layout, foundation depth, and staircase detailing.",
+                    image: galleryList[3] || galleryList[0] || "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1000&q=80",
+                  },
+                ].map((dwg, idx) => (
                   <div
-                    onClick={() => setLightboxImage(dwg.image)}
-                    className="relative aspect-[16/10] bg-[#111] overflow-hidden cursor-pointer"
+                    key={idx}
+                    className="bg-white border border-[#e5e5e5] rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-shadow group"
                   >
-                    <Image
-                      src={dwg.image}
-                      alt={dwg.title}
-                      fill
-                      className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-103 transition-all duration-300"
-                    />
-                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5">
-                      <ZoomIn className="w-3 h-3 text-primary" /> View Drawing
+                    <div
+                      onClick={() => setLightboxImage(dwg.image)}
+                      className="relative aspect-[16/10] bg-[#111] overflow-hidden cursor-pointer"
+                    >
+                      <Image
+                        src={dwg.image}
+                        alt={dwg.title}
+                        fill
+                        className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-103 transition-all duration-300"
+                      />
+                      <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                        <ZoomIn className="w-3 h-3 text-primary" /> View Drawing
+                      </div>
+                    </div>
+                    <div className="p-5 space-y-1.5">
+                      <h4 className="font-bold text-charcoal text-sm">{dwg.title}</h4>
+                      <p className="text-dark-gray/70 text-xs leading-relaxed">{dwg.desc}</p>
                     </div>
                   </div>
-                  <div className="p-5 space-y-1.5">
-                    <h4 className="font-bold text-charcoal text-sm">{dwg.title}</h4>
-                    <p className="text-dark-gray/70 text-xs leading-relaxed">{dwg.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -2549,7 +2644,7 @@ export default function ProjectDetailClient({ project }: { project: ProjectDetai
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {galleryList.slice(0, 6).map((img, i) => (
+              {galleryList.slice(0, 5).map((img, i) => (
                 <div key={i} className="bg-white border border-[#e5e5e5] rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-shadow group">
                   <div
                     onClick={() => setLightboxImage(img)}
@@ -2557,13 +2652,13 @@ export default function ProjectDetailClient({ project }: { project: ProjectDetai
                   >
                     <Image
                       src={img}
-                      alt={`${project.title} space ${i + 1}`}
+                      alt={project.spaceNames?.[i] || `${project.title} space ${i + 1}`}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                   <div className="p-5 space-y-1">
-                    <h4 className="font-bold text-charcoal text-sm">Design Space #{i + 1}</h4>
+                    <h4 className="font-bold text-charcoal text-sm">{project.spaceNames?.[i] || `Design Space #${i + 1}`}</h4>
                     <p className="text-dark-gray/70 text-xs leading-relaxed">
                       Custom tailored spatial detailing and execution for {project.title}.
                     </p>
@@ -2575,66 +2670,146 @@ export default function ProjectDetailClient({ project }: { project: ProjectDetai
         )}
 
         {/* TAB: MATERIALS & FINISHES */}
-        {(activeTab === "MATERIALS & FINISHES" || activeTab === "MATERIALS") && (
-          <div className="space-y-10 py-14">
-            <div className="text-center max-w-2xl mx-auto space-y-2">
-              <h2 className="text-2xl md:text-3xl font-bold text-charcoal">Materials & Finishes</h2>
-              <p className="text-dark-gray/70 text-xs md:text-sm">
-                Tactile materials carefully selected for durability, sustainability, and sensory beauty.
-              </p>
-            </div>
+        {(activeTab === "MATERIALS & FINISHES" || activeTab === "MATERIALS") && (() => {
+          const mat = project.materialsData;
+          const isInteriorCat = project.category.toLowerCase().includes("interior");
+          const isLandscapeCat = project.category.toLowerCase().includes("landscape");
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                {
-                  name: "Italian Calacatta Marble",
-                  type: "Countertops & Feature Walls",
-                  desc: "Selected for dramatic grey-gold veining and timeless natural sophistication.",
-                  image: galleryList[0],
-                },
-                {
-                  name: "Natural European Oak",
-                  type: "Flooring & Bespoke Joinery",
-                  desc: "Fumed matte finish delivering organic warmth and tactile texture.",
-                  image: galleryList[1] || galleryList[0],
-                },
-                {
-                  name: "Matte Black Anodized Metal",
-                  type: "Fixtures & Window Mullions",
-                  desc: "Precision laser-cut architectural profiles with sleek scratch-resistant coating.",
-                  image: galleryList[2] || galleryList[0],
-                },
-                {
-                  name: "Low-E Double Glazed Glass",
-                  type: "Facade & Sliding Doors",
-                  desc: "Thermal barrier optimizing acoustic silence and energy efficiency.",
-                  image: galleryList[3] || galleryList[0],
-                },
-              ].map((mat, i) => (
-                <div key={i} className="bg-white border border-[#e5e5e5] rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-shadow group">
-                  <div
-                    onClick={() => setLightboxImage(mat.image)}
-                    className="relative aspect-square overflow-hidden cursor-pointer"
-                  >
-                    <Image
-                      src={mat.image}
-                      alt={mat.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+          const defaultConcept = isInteriorCat
+            ? "The material palette is inspired by warmth and refined simplicity—combining natural textures, premium finishes, and curated tones to create a timeless and sophisticated atmosphere. Every material is selected for its quality, durability and ability to enhance the overall design language of the space."
+            : isLandscapeCat
+            ? "The material palette is chosen to complement the natural landscape—combining indigenous stone, sustainable timber, and native plantings to create spaces that feel organic and enduring. Every element is selected to age gracefully and harmonize with the surrounding environment."
+            : "The material palette is inspired by nature and refined simplicity—combining natural textures, warm tones and modern detailing to create a timeless and sophisticated atmosphere. Every material is selected for its quality, durability and ability to enhance the overall design language of the home.";
+
+          const defaultQuote = "Quality materials, thoughtful details and expert craftsmanship create spaces that stand the test of time.";
+
+          const defaultExterior = isInteriorCat ? [] : isLandscapeCat
+            ? ["Natural Stone Paving", "Timber Decking (Treated)", "Exposed Brick Feature Walls", "Weathering Steel Accents", "Concrete Planters"]
+            : ["Natural Stone Cladding", "Textured Paint (Beige)", "Wood Look Aluminum Louvers", "Dark Aluminum Framing", "Clear Glass (Railing & Windows)", "Concrete Pavers (Driveway)"];
+
+          const defaultFloors = isLandscapeCat
+            ? ["Granite Cobblestone (Plazas)", "Gravel Pathways", "Timber Boardwalk", "Porcelain Tiles (Pavilions)"]
+            : ["Marble Flooring (Entrance & Lobby)", "Large Format Porcelain Tiles (Living, Dining)", "Engineered Wood (Living & Bedrooms)", "Anti-Skid Porcelain Tiles (Bathrooms)", "Outdoor Porcelain Tiles (Terrace & Balcony)"];
+
+          const defaultWalls = isLandscapeCat
+            ? ["Rough-cut Limestone Walls", "Corten Steel Panels", "Rendered Concrete (Feature Walls)", "Natural Stone Veneer"]
+            : ["Paint Finish (Warm White)", "Wood Wall Paneling (Accent Walls)", "Natural Stone Veneer (Feature Walls)", "Textured Wall Panel (Bedrooms)", "Porcelain Wall Tiles (Bathrooms)"];
+
+          const defaultCeiling = isLandscapeCat
+            ? ["Timber Pergola Structures", "Tensile Shade Fabric", "Polycarbonate Roofing (Shelters)", "Open-Sky Plazas"]
+            : ["False Ceiling with Cove Lighting", "Wooden Ceiling Cladding", "Recessed LED Downlights", "Exposed Concrete (Feature Areas)"];
+
+          const defaultJoinery = isLandscapeCat
+            ? ["Hardwood Benches & Seating", "Steel-Frame Pergolas", "Prefab Pavilion Units", "Ornamental Iron Fencing"]
+            : ["Wooden Doors & Frames", "Built-in Wardrobes (Wood Finish)", "Kitchen Cabinetry (Matte Finish)", "Vanity Units (Stone Top)"];
+
+          const defaultMetal = isLandscapeCat
+            ? ["Galvanized Steel Railings", "Aluminum Signage & Wayfinding", "Cast Iron Grates & Channels", "Brass Fixture Accents"]
+            : ["Black Metal Handrail", "Brass/Gold Metal Accents", "Glass Partition (Frameless)", "Aluminum Pergola (Outdoor)"];
+
+          const defaultSustainable = isLandscapeCat
+            ? ["Native & drought-tolerant plantings", "Permeable paving to reduce runoff", "Solar-powered landscape lighting", "Rainwater harvesting for irrigation", "Recycled timber and reclaimed materials"]
+            : ["Energy-efficient windows for better insulation", "Natural materials for a healthier environment", "LED lighting for energy savings", "Low-VOC paints for better indoor air quality", "Water-efficient fixtures in all bathrooms"];
+
+          const sections = [
+            ...(!isInteriorCat ? [{ title: isLandscapeCat ? "HARDSCAPE & SURFACES" : "EXTERIOR FINISHES", items: mat?.exteriorFinishes ?? defaultExterior }] : []),
+            { title: isLandscapeCat ? "PAVING & FLOORING" : "INTERIOR FINISHES – FLOORS", items: mat?.interiorFloors ?? defaultFloors },
+            { title: isLandscapeCat ? "VERTICAL ELEMENTS" : "INTERIOR FINISHES – WALLS", items: mat?.interiorWalls ?? defaultWalls },
+            { title: isLandscapeCat ? "OVERHEAD STRUCTURES" : "CEILING & LIGHTING", items: mat?.ceilingLighting ?? defaultCeiling },
+            { title: isLandscapeCat ? "FURNITURE & STRUCTURES" : "JOINERY & MILLWORK", items: mat?.joineryMillwork ?? defaultJoinery },
+            { title: isLandscapeCat ? "METALWORK & ACCESSORIES" : "METAL & GLASS DETAILS", items: mat?.metalGlass ?? defaultMetal },
+          ].filter(s => s.items.length > 0);
+
+          const sustainableItems = mat?.sustainableChoices ?? defaultSustainable;
+          const concept = mat?.concept ?? defaultConcept;
+          const quote = mat?.quote ?? defaultQuote;
+
+          return (
+            <div className="py-14 space-y-0">
+              {/* Top two-column layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                {/* LEFT: Concept panel */}
+                <div className="lg:col-span-4 space-y-6">
+                  <div>
+                    <h2 className="text-xl md:text-2xl font-bold text-charcoal leading-tight">
+                      Materials &amp; Finishes Concept
+                    </h2>
+                    <div className="w-10 h-0.5 bg-primary mt-2" />
                   </div>
-                  <div className="p-4 space-y-1">
-                    <span className="text-primary font-bold text-[10px] uppercase tracking-wider block">
-                      {mat.type}
-                    </span>
-                    <h4 className="font-bold text-charcoal text-sm">{mat.name}</h4>
-                    <p className="text-dark-gray/70 text-xs leading-relaxed">{mat.desc}</p>
+                  <p className="text-dark-gray/80 text-[13px] leading-relaxed">{concept}</p>
+                  {/* Blockquote */}
+                  <div className="border-l-[3px] border-primary bg-[#f6fbf7] rounded-r-xl p-5 flex gap-3 items-start">
+                    <span className="text-primary text-3xl font-serif leading-none mt-0.5 select-none">&ldquo;</span>
+                    <p className="text-charcoal text-[13px] font-medium leading-relaxed italic">{quote}</p>
                   </div>
                 </div>
-              ))}
+
+                {/* RIGHT: Material sections */}
+                <div className="lg:col-span-8 space-y-7">
+                  {sections.map((section, si) => (
+                    <div key={si}>
+                      <h3 className="text-[10px] font-bold tracking-[0.18em] text-charcoal/50 uppercase mb-3 border-b border-[#ebebeb] pb-2">
+                        {section.title}
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {section.items.map((item, ii) => (
+                          <div
+                            key={ii}
+                            className="bg-white border border-[#e3e3e3] rounded-lg px-3 py-2.5 min-w-[90px] hover:border-primary/40 hover:shadow-sm transition-all group cursor-default"
+                          >
+                            <div className="w-full h-[2px] bg-primary/25 rounded-full mb-2 group-hover:bg-primary transition-colors" />
+                            <p className="text-[11px] text-charcoal font-medium leading-snug text-center">{item}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Sustainable choices */}
+                  {sustainableItems.length > 0 && (
+                    <div className="bg-[#f6fbf7] border border-primary/20 rounded-xl p-5 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center text-primary text-[10px] font-bold">✦</div>
+                        <h4 className="text-[10px] font-bold tracking-[0.14em] text-charcoal uppercase">Sustainable Choices</h4>
+                      </div>
+                      <ul className="space-y-1.5">
+                        {sustainableItems.map((item, ii) => (
+                          <li key={ii} className="flex items-start gap-2 text-[12px] text-dark-gray">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" strokeWidth={2.5} />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Footer: 5 quality pillars */}
+              <div className="border-t border-[#ebebeb] pt-10 mt-10">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+                  {[
+                    { icon: "⬡", title: "Premium Quality", desc: "Carefully selected high-quality materials" },
+                    { icon: "◈", title: "Timeless Aesthetic", desc: "A palette that remains elegant for years" },
+                    { icon: "◆", title: "Durability", desc: "Materials chosen for long-lasting performance" },
+                    { icon: "◉", title: "Comfort", desc: "Enhancing daily living through better materials" },
+                    { icon: "⬟", title: "Seamless Harmony", desc: "Balanced textures, colors and finishes" },
+                  ].map((pillar, i) => (
+                    <div key={i} className="flex flex-col items-start gap-2">
+                      <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-sm">
+                        {pillar.icon}
+                      </div>
+                      <div>
+                        <h5 className="text-[12px] font-bold text-charcoal">{pillar.title}</h5>
+                        <p className="text-[11px] text-dark-gray/70 leading-snug mt-0.5">{pillar.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* TAB: DESIGN CONCEPT / CONCEPT */}
         {(activeTab === "DESIGN CONCEPT" || activeTab === "CONCEPT") && (

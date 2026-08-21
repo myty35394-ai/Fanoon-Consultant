@@ -2,7 +2,25 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { X, Loader2, Sparkles, User, Trash2, Users, Check } from "lucide-react";
+import {
+  X,
+  Loader2,
+  Sparkles,
+  User,
+  Trash2,
+  Users,
+  Check,
+  Building2,
+  Compass,
+  HardHat,
+  Trees,
+  Box,
+  ClipboardCheck,
+  Info,
+  ImageIcon,
+  FileText,
+  Sliders,
+} from "lucide-react";
 import ImageUploader from "@/components/admin/ImageUploader";
 
 interface TeamMember {
@@ -11,6 +29,15 @@ interface TeamMember {
   role: string;
   imageUrl: string;
 }
+
+const CATEGORIES = [
+  { id: "Architecture", label: "Architecture", icon: Building2 },
+  { id: "Interior Design", label: "Interior Design", icon: Compass },
+  { id: "Landscape Design", label: "Landscape Design", icon: Trees },
+  { id: "3D Visualization", label: "3D Visualization", icon: Box },
+  { id: "Construction Supervision", label: "Construction Supervision", icon: HardHat },
+  { id: "Project Management", label: "Project Management", icon: ClipboardCheck },
+];
 
 export default function ProjectFormModal({
   isOpen,
@@ -23,34 +50,59 @@ export default function ProjectFormModal({
   onSuccess: () => void;
   defaultTab?: "fanoon" | "arsalan";
 }) {
+  // Form State
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Architecture");
+  const [tagline, setTagline] = useState("");
   const [client, setClient] = useState("");
   const [location, setLocation] = useState("");
   const [year, setYear] = useState("2026");
-  const [tagline, setTagline] = useState("");
+  const [status, setStatus] = useState("Completed");
+
+  // Specs State
   const [plotSize, setPlotSize] = useState("");
   const [area, setArea] = useState("");
   const [floors, setFloors] = useState("");
   const [scope, setScope] = useState("");
-  const [status, setStatus] = useState("Completed");
+  const [duration, setDuration] = useState("");
+  const [constructionType, setConstructionType] = useState("");
+  const [description, setDescription] = useState("");
+
+  // Media State
   const [coverImage, setCoverImage] = useState("");
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [spaceNames, setSpaceNames] = useState<string[]>([]);
+  const [drawingImages, setDrawingImages] = useState<string[]>([]);
+
+  // Team & Publishing State
   const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([]);
-  const [description, setDescription] = useState("");
   const [featured, setFeatured] = useState(false);
   const [isArsalan, setIsArsalan] = useState(defaultTab === "arsalan");
+
+  // Materials & Finishes State (for Architecture, Interior, Landscape)
+  const [matConcept, setMatConcept] = useState("");
+  const [matQuote, setMatQuote] = useState("");
+  const [matExterior, setMatExterior] = useState("");
+  const [matFloors, setMatFloors] = useState("");
+  const [matWalls, setMatWalls] = useState("");
+  const [matCeiling, setMatCeiling] = useState("");
+  const [matJoinery, setMatJoinery] = useState("");
+  const [matMetal, setMatMetal] = useState("");
+  const [matSustainable, setMatSustainable] = useState("");
+
+
+  // Auxiliary
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [allTeamMembers, setAllTeamMembers] = useState<TeamMember[]>([]);
   const [loadingTeam, setLoadingTeam] = useState(false);
 
-  // Sync isArsalan when defaultTab changes
+  // Sync default tab
   useEffect(() => {
     setIsArsalan(defaultTab === "arsalan");
   }, [defaultTab]);
 
-  // Load team members when modal opens
+  // Load team members
   useEffect(() => {
     if (!isOpen) return;
     setLoadingTeam(true);
@@ -68,11 +120,29 @@ export default function ProjectFormModal({
   const handleAddGalleryImage = (url: string) => {
     if (url && galleryImages.length < 5) {
       setGalleryImages([...galleryImages, url]);
+      setSpaceNames([...spaceNames, ""]);
     }
   };
 
   const handleRemoveGalleryImage = (index: number) => {
     setGalleryImages(galleryImages.filter((_, idx) => idx !== index));
+    setSpaceNames(spaceNames.filter((_, idx) => idx !== index));
+  };
+
+  const handleSpaceNameChange = (index: number, name: string) => {
+    const newNames = [...spaceNames];
+    newNames[index] = name;
+    setSpaceNames(newNames);
+  };
+
+  const handleAddDrawingImage = (url: string) => {
+    if (url && drawingImages.length < 3) {
+      setDrawingImages([...drawingImages, url]);
+    }
+  };
+
+  const handleRemoveDrawingImage = (index: number) => {
+    setDrawingImages(drawingImages.filter((_, idx) => idx !== index));
   };
 
   const toggleTeamMember = (id: string) => {
@@ -81,31 +151,70 @@ export default function ProjectFormModal({
     );
   };
 
+  const isDrawingSupported =
+    category === "Architecture" ||
+    category === "Interior Design" ||
+    category === "Landscape Design";
+
+  const isMaterialsSupported =
+    category === "Architecture" ||
+    category === "Interior Design" ||
+    category === "Landscape Design";
+
+  const splitLines = (s: string) => s.split("\n").map(l => l.trim()).filter(Boolean);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!title.trim()) {
+      setError("Please enter a project title.");
+      return;
+    }
+    if (!coverImage.trim()) {
+      setError("Please upload a main cover image.");
+      return;
+    }
+
     setLoading(true);
     setError("");
+
+    // Build materialsData JSON if applicable
+    const materialsData = isMaterialsSupported ? {
+      concept: matConcept.trim() || undefined,
+      quote: matQuote.trim() || undefined,
+      exteriorFinishes: splitLines(matExterior).length ? splitLines(matExterior) : undefined,
+      interiorFloors: splitLines(matFloors).length ? splitLines(matFloors) : undefined,
+      interiorWalls: splitLines(matWalls).length ? splitLines(matWalls) : undefined,
+      ceilingLighting: splitLines(matCeiling).length ? splitLines(matCeiling) : undefined,
+      joineryMillwork: splitLines(matJoinery).length ? splitLines(matJoinery) : undefined,
+      metalGlass: splitLines(matMetal).length ? splitLines(matMetal) : undefined,
+      sustainableChoices: splitLines(matSustainable).length ? splitLines(matSustainable) : undefined,
+    } : undefined;
 
     try {
       const res = await fetch("/api/admin/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title,
+          title: title.trim(),
           category,
-          client,
-          location,
-          year,
-          tagline,
-          plotSize,
-          area,
-          floors,
-          scope,
-          status,
-          coverImage: coverImage || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
+          client: client.trim() || null,
+          location: location.trim() || null,
+          year: year.trim() || new Date().getFullYear().toString(),
+          tagline: tagline.trim() || null,
+          plotSize: plotSize.trim() || null,
+          area: area.trim() || null,
+          floors: floors.trim() || null,
+          scope: scope.trim() || null,
+          duration: duration.trim() || null,
+          constructionType: constructionType.trim() || null,
+          status: status.trim() || "Completed",
+          coverImage: coverImage.trim(),
           galleryImages: galleryImages.filter(Boolean),
+          spaceNames,
+          drawingImages: isDrawingSupported ? drawingImages.filter(Boolean) : [],
           teamMembers: selectedTeamIds,
-          description,
+          description: description.trim() || null,
+          materialsData: materialsData ? JSON.stringify(materialsData) : null,
           featured,
           isArsalan,
         }),
@@ -117,296 +226,556 @@ export default function ProjectFormModal({
       } else {
         onSuccess();
         onClose();
-        // Reset form
+        // Reset fields
         setTitle("");
+        setTagline("");
         setClient("");
         setLocation("");
-        setTagline("");
+        setYear("2026");
+        setStatus("Completed");
         setPlotSize("");
         setArea("");
         setFloors("");
         setScope("");
-        setStatus("Completed");
+        setDuration("");
+        setConstructionType("");
+        setDescription("");
         setCoverImage("");
         setGalleryImages([]);
+        setSpaceNames([]);
+        setDrawingImages([]);
         setSelectedTeamIds([]);
-        setDescription("");
         setFeatured(false);
         setIsArsalan(defaultTab === "arsalan");
+        setMatConcept(""); setMatQuote(""); setMatExterior(""); setMatFloors("");
+        setMatWalls(""); setMatCeiling(""); setMatJoinery(""); setMatMetal(""); setMatSustainable("");
       }
     } catch {
-      setError("An unexpected error occurred.");
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#141b16] border border-white/10 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto no-scrollbar p-6 md:p-8 shadow-2xl">
-        <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
-            Add New Project
-          </h2>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+      <div className="bg-[#121814] border border-white/10 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] my-auto">
+        {/* ── HEADER ─────────────────────────────────────────── */}
+        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#151e18] flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-primary/20 text-primary flex items-center justify-center">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-white leading-tight">
+                Add New Project
+              </h2>
+              <p className="text-xs text-white/50">
+                Fill in the details below to publish a new portfolio project
+              </p>
+            </div>
+          </div>
+
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
+        {/* ── ERROR MESSAGE ───────────────────────────────────── */}
         {error && (
-          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
-            {error}
+          <div className="mx-6 mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-xs flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Info className="w-4 h-4 text-red-400 shrink-0" />
+              <span>{error}</span>
+            </div>
+            <button onClick={() => setError("")} className="text-red-400 hover:text-red-200">
+              <X className="w-3.5 h-3.5" />
+            </button>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+        {/* ── SCROLLABLE FORM BODY ────────────────────────────── */}
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto no-scrollbar space-y-6 flex-1 text-xs">
+          {/* 1. CATEGORY SELECTOR */}
           <div>
-            <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
-              Project Title *
+            <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider mb-2">
+              1. Select Project Category *
             </label>
-            <input
-              type="text"
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Modern Residential Villa"
-              className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
-                Category *
-              </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
-              >
-                <option value="Architecture">Architecture</option>
-                <option value="Interior Design">Interior Design</option>
-                <option value="Landscape Design">Landscape Design</option>
-                <option value="3D Visualization">3D Visualization</option>
-                <option value="Project Management">Project Management</option>
-                <option value="Construction Supervision">Construction Supervision</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
-                Year
-              </label>
-              <input
-                type="text"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                placeholder="2026"
-                className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
-              />
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {CATEGORIES.map((cat) => {
+                const Icon = cat.icon;
+                const isSelected = category === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setCategory(cat.id)}
+                    className={`flex items-center gap-2 p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? "bg-primary/20 border-primary text-white font-bold ring-1 ring-primary"
+                        : "bg-[#18221b] border-white/8 text-white/70 hover:border-white/20 hover:text-white"
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 ${isSelected ? "text-primary" : "text-white/40"}`} />
+                    <span className="truncate">{cat.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
-                Client Name
-              </label>
-              <input
-                type="text"
-                value={client}
-                onChange={(e) => setClient(e.target.value)}
-                placeholder="e.g. Private Client"
-                className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
-              />
-            </div>
+          {/* 2. BASIC INFORMATION */}
+          <div className="p-4 bg-[#162019] border border-white/8 rounded-xl space-y-3.5">
+            <h3 className="text-xs font-bold text-white/90 uppercase tracking-wider flex items-center gap-1.5 border-b border-white/6 pb-2">
+              <FileText className="w-3.5 h-3.5 text-primary" /> Basic Information
+            </h3>
 
-            <div>
-              <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
-                Location
-              </label>
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. Islamabad, Pakistan"
-                className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
-              />
-            </div>
-          </div>
-
-          {/* Tagline */}
-          <div>
-            <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
-              Tagline <span className="text-white/30 normal-case text-[10px] font-normal">(short hero subtitle)</span>
-            </label>
-            <input
-              type="text"
-              value={tagline}
-              onChange={(e) => setTagline(e.target.value)}
-              placeholder="e.g. Realistic. Detailed. Inspiring."
-              className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
-            />
-          </div>
-
-          {/* Plot Size & Area */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
-                Plot Size
-              </label>
-              <input
-                type="text"
-                value={plotSize}
-                onChange={(e) => setPlotSize(e.target.value)}
-                placeholder="e.g. 10 Marla / 1 Kanal"
-                className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
-              />
-            </div>
-            <div>
-              <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
-                Built-up Area
-              </label>
-              <input
-                type="text"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                placeholder="e.g. 3,200 SQ FT"
-                className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
-              />
-            </div>
-          </div>
-
-          {/* Floors & Scope */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
-                Floors
-              </label>
-              <input
-                type="text"
-                value={floors}
-                onChange={(e) => setFloors(e.target.value)}
-                placeholder="e.g. G+1 / G+3"
-                className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
-              />
-            </div>
-            <div>
-              <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
-                Scope
-              </label>
-              <input
-                type="text"
-                value={scope}
-                onChange={(e) => setScope(e.target.value)}
-                placeholder="e.g. Exterior Visualization"
-                className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
-              />
-            </div>
-          </div>
-
-          {/* Status */}
-          <div>
-            <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
-              Project Status
-            </label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-full bg-[#1c261f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-sm"
-            >
-              <option value="Completed">Completed</option>
-              <option value="Completed (2025)">Completed (2025)</option>
-              <option value="Completed (2024)">Completed (2024)</option>
-              <option value="Completed (2023)">Completed (2023)</option>
-              <option value="Ongoing">Ongoing</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Under Construction">Under Construction</option>
-            </select>
-          </div>
-
-          <ImageUploader
-            value={coverImage}
-            onChange={setCoverImage}
-            folder="fanoon-consultants/projects"
-            label="Cover Image *"
-          />
-
-          {/* 5 Project Gallery Images */}
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between">
-              <label className="block font-medium text-white/70 uppercase tracking-wider">
-                Project Gallery Images ({galleryImages.length}/5)
-              </label>
-              <span className="text-[11px] text-white/40">Upload up to 5 photos for gallery</span>
-            </div>
-
-            {/* Current gallery previews */}
-            {galleryImages.length > 0 && (
-              <div className="grid grid-cols-5 gap-2.5">
-                {galleryImages.map((imgUrl, idx) => (
-                  <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-white/20 group">
-                    <Image src={imgUrl} alt={`Gallery image ${idx + 1}`} fill className="object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveGalleryImage(idx)}
-                      className="absolute top-1 right-1 p-1 bg-red-600/90 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                    <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/70 text-[9px] text-white font-bold rounded">
-                      #{idx + 1}
-                    </span>
-                  </div>
-                ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label className="block text-[11px] font-semibold text-white/70 mb-1">
+                  Project Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. Modern Residential Villa"
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg px-3.5 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-primary text-xs"
+                />
               </div>
-            )}
 
-            {/* Upload next gallery slot if less than 5 */}
-            {galleryImages.length < 5 && (
-              <div className="p-3.5 bg-[#18221b] border border-white/10 border-dashed rounded-xl space-y-2">
+              <div>
+                <label className="block text-[11px] font-semibold text-white/70 mb-1">
+                  Subtitle / Tagline
+                </label>
+                <input
+                  type="text"
+                  value={tagline}
+                  onChange={(e) => setTagline(e.target.value)}
+                  placeholder="e.g. Luxury Living in Islamabad"
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg px-3.5 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-primary text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-white/70 mb-1">
+                  Client Name
+                </label>
+                <input
+                  type="text"
+                  value={client}
+                  onChange={(e) => setClient(e.target.value)}
+                  placeholder="e.g. Private Client"
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg px-3.5 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-primary text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-white/70 mb-1">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g. Islamabad, Pakistan"
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg px-3.5 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-primary text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-white/70 mb-1">
+                  Year
+                </label>
+                <input
+                  type="text"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  placeholder="2026"
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg px-3.5 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-primary text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-white/70 mb-1">
+                  Status
+                </label>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-primary text-xs"
+                >
+                  <option value="Completed">Completed</option>
+                  <option value="Completed (2026)">Completed (2026)</option>
+                  <option value="Completed (2025)">Completed (2025)</option>
+                  <option value="Completed (2024)">Completed (2024)</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Under Construction">Under Construction</option>
+                  <option value="Ongoing">Ongoing</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. SPECIFICATIONS & OVERVIEW */}
+          <div className="p-4 bg-[#162019] border border-white/8 rounded-xl space-y-3.5">
+            <h3 className="text-xs font-bold text-white/90 uppercase tracking-wider flex items-center gap-1.5 border-b border-white/6 pb-2">
+              <Sliders className="w-3.5 h-3.5 text-primary" /> {category} Specifications
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div>
+                <label className="block text-[11px] font-semibold text-white/70 mb-1">
+                  {category === "Landscape Design"
+                    ? "Total Land Area"
+                    : category === "Interior Design"
+                    ? "Interior Area"
+                    : category === "Construction Supervision"
+                    ? "Covered Area"
+                    : "Plot Size"}
+                </label>
+                <input
+                  type="text"
+                  value={plotSize}
+                  onChange={(e) => setPlotSize(e.target.value)}
+                  placeholder={
+                    category === "Landscape Design"
+                      ? "e.g. 125 Acres / 2 Kanal"
+                      : category === "Interior Design"
+                      ? "e.g. 3,500 SQ FT"
+                      : category === "Construction Supervision"
+                      ? "e.g. 180,000 SQ FT"
+                      : "e.g. 1 Kanal / 10 Marla"
+                  }
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg px-3.5 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-primary text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-white/70 mb-1">
+                  {category === "Landscape Design"
+                    ? "Greenery / Flora"
+                    : category === "Interior Design"
+                    ? "Design Style / Theme"
+                    : category === "Construction Supervision"
+                    ? "Structure Type"
+                    : category === "3D Visualization"
+                    ? "Software Engine"
+                    : "Built-up Area"}
+                </label>
+                <input
+                  type="text"
+                  value={area}
+                  onChange={(e) => setArea(e.target.value)}
+                  placeholder={
+                    category === "Landscape Design"
+                      ? "e.g. 65% Native Trees"
+                      : category === "Interior Design"
+                      ? "e.g. Contemporary Luxury"
+                      : category === "Construction Supervision"
+                      ? "e.g. RCC Frame"
+                      : category === "3D Visualization"
+                      ? "e.g. 3ds Max / Corona"
+                      : "e.g. 4,500 SQ FT"
+                  }
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg px-3.5 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-primary text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-white/70 mb-1">
+                  {category === "Landscape Design"
+                    ? "Pathways Length"
+                    : category === "Construction Supervision"
+                    ? "Building Floors"
+                    : category === "Project Management"
+                    ? "Duration"
+                    : "Floors / Levels"}
+                </label>
+                <input
+                  type="text"
+                  value={floors}
+                  onChange={(e) => setFloors(e.target.value)}
+                  placeholder={
+                    category === "Landscape Design"
+                      ? "e.g. 2.5 KM Tracks"
+                      : category === "Construction Supervision"
+                      ? "e.g. 2 Basements + G+8"
+                      : "e.g. G+1 / G+2"
+                  }
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg px-3.5 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-primary text-xs"
+                />
+              </div>
+
+              <div className="sm:col-span-3">
+                <label className="block text-[11px] font-semibold text-white/70 mb-1">
+                  Project Scope
+                </label>
+                <input
+                  type="text"
+                  value={scope}
+                  onChange={(e) => setScope(e.target.value)}
+                  placeholder="e.g. Full Architectural Design, Interior Detailing & 3D Visualization"
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg px-3.5 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-primary text-xs"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-semibold text-white/70 mb-1">
+                Project Overview &amp; Description
+              </label>
+              <textarea
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Brief summary of the project concept, spatial layout, and design highlights..."
+                className="w-full bg-[#1b271f] border border-white/10 rounded-lg p-3 text-white placeholder-white/30 focus:outline-none focus:border-primary text-xs leading-relaxed"
+              />
+            </div>
+          </div>
+
+          {/* 4. MEDIA UPLOAD (Cover, Gallery, Drawings) */}
+          <div className="p-4 bg-[#162019] border border-white/8 rounded-xl space-y-4">
+            <h3 className="text-xs font-bold text-white/90 uppercase tracking-wider flex items-center gap-1.5 border-b border-white/6 pb-2">
+              <ImageIcon className="w-3.5 h-3.5 text-primary" /> Project Photos &amp; Drawings
+            </h3>
+
+            {/* A. Cover Image */}
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-semibold text-white/80">
+                1. Main Cover Image * (Hero banner)
+              </label>
+              <ImageUploader
+                value={coverImage}
+                onChange={setCoverImage}
+                folder="fanoon-consultants/projects"
+                label=""
+              />
+            </div>
+
+            {/* B. Gallery Photos (Max 5) */}
+            <div className="space-y-2 pt-2">
+              <div className="flex items-center justify-between">
+                <label className="block text-[11px] font-semibold text-white/80">
+                  2. Gallery Photos ({galleryImages.length}/5 uploaded)
+                </label>
+                <span className="text-[10px] text-white/40">Max 5 images</span>
+              </div>
+
+              {galleryImages.length > 0 && (
+                <div className="grid grid-cols-5 gap-2">
+                  {galleryImages.map((img, idx) => (
+                    <div key={idx} className="space-y-1.5">
+                      <div
+                        className="relative aspect-square rounded-lg overflow-hidden border border-white/15 group"
+                      >
+                        <Image src={img} alt={`Gallery ${idx + 1}`} fill className="object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveGalleryImage(idx)}
+                          className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-red-400 hover:text-red-200 cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={spaceNames[idx] || ""}
+                        onChange={(e) => handleSpaceNameChange(idx, e.target.value)}
+                        placeholder={`Space ${idx + 1} Name`}
+                        className="w-full bg-[#1b271f] border border-white/10 rounded p-1.5 text-white placeholder-white/40 focus:outline-none focus:border-primary text-[10px] text-center"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {galleryImages.length < 5 && (
                 <ImageUploader
                   value=""
                   onChange={(url) => handleAddGalleryImage(url)}
                   folder="fanoon-consultants/projects/gallery"
-                  label={`Add Gallery Photo (${galleryImages.length + 1} of 5)`}
+                  label={`+ Add Gallery Photo (${galleryImages.length + 1} of 5)`}
                 />
+              )}
+            </div>
+
+            {/* C. Technical Drawings (Max 3) */}
+            {isDrawingSupported && (
+              <div className="space-y-2 pt-2 border-t border-white/6">
+                <div className="flex items-center justify-between">
+                  <label className="block text-[11px] font-semibold text-white/80">
+                    3. Technical Drawings &amp; Blueprints ({drawingImages.length}/3 uploaded)
+                  </label>
+                  <span className="text-[10px] text-white/40">Max 3 drawings</span>
+                </div>
+
+                {drawingImages.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {drawingImages.map((img, idx) => (
+                      <div
+                        key={idx}
+                        className="relative aspect-[16/10] rounded-lg overflow-hidden border border-white/15 group"
+                      >
+                        <Image src={img} alt={`Drawing ${idx + 1}`} fill className="object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDrawingImage(idx)}
+                          className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-red-400 hover:text-red-200 cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/80 text-[9px] text-primary font-bold rounded">
+                          Plan #{idx + 1}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {drawingImages.length < 3 && (
+                  <ImageUploader
+                    value=""
+                    onChange={(url) => handleAddDrawingImage(url)}
+                    folder="fanoon-consultants/projects/drawings"
+                    label={`+ Add Drawing Plan (${drawingImages.length + 1} of 3)`}
+                  />
+                )}
               </div>
             )}
           </div>
 
-          {/* Team Member Selection */}
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between">
-              <label className="block font-medium text-white/70 uppercase tracking-wider flex items-center gap-2">
-                <Users className="w-3.5 h-3.5 text-primary" />
-                Assign Team Members
-                {selectedTeamIds.length > 0 && (
-                  <span className="ml-1 px-1.5 py-0.5 bg-primary/20 text-primary rounded text-[10px] font-bold">
-                    {selectedTeamIds.length} selected
-                  </span>
-                )}
-              </label>
-              <span className="text-[11px] text-white/40">Select who worked on this project</span>
-            </div>
+          {/* 5. MATERIALS & FINISHES (Architecture, Interior, Landscape only) */}
+          {isMaterialsSupported && (
+            <div className="p-4 bg-[#162019] border border-white/8 rounded-xl space-y-4">
+              <div className="border-b border-white/6 pb-2 flex items-start justify-between">
+                <h3 className="text-xs font-bold text-white/90 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sliders className="w-3.5 h-3.5 text-primary" /> Materials &amp; Finishes
+                </h3>
+                <span className="text-[10px] text-white/40 italic">Optional — leave blank to use smart defaults</span>
+              </div>
 
-            <div className="bg-[#18221b] border border-white/10 rounded-xl p-3">
+              {/* Concept description */}
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-white/70">Concept Paragraph</label>
+                <textarea
+                  rows={2}
+                  value={matConcept}
+                  onChange={(e) => setMatConcept(e.target.value)}
+                  placeholder="Describe the overall material philosophy and palette for this project..."
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg p-3 text-white placeholder-white/25 focus:outline-none focus:border-primary text-xs leading-relaxed"
+                />
+              </div>
+
+              {/* Blockquote */}
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-white/70">Featured Quote</label>
+                <input
+                  type="text"
+                  value={matQuote}
+                  onChange={(e) => setMatQuote(e.target.value)}
+                  placeholder="e.g. Quality materials, thoughtful details and expert craftsmanship..."
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg px-3.5 py-2.5 text-white placeholder-white/25 focus:outline-none focus:border-primary text-xs"
+                />
+              </div>
+
+              <p className="text-[10px] text-white/40 -mt-1">For the sections below, enter <strong className="text-white/60">one item per line</strong>. E.g. &ldquo;Marble Flooring (Entrance)&rdquo;</p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {category !== "Interior Design" && (
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-semibold text-white/70">
+                      {category === "Landscape Design" ? "Hardscape & Surfaces" : "Exterior Finishes"}
+                    </label>
+                    <textarea rows={3} value={matExterior} onChange={(e) => setMatExterior(e.target.value)}
+                      placeholder={"Natural Stone Cladding\nTextured Paint (Beige)\nWood Look Aluminum Louvers"}
+                      className="w-full bg-[#1b271f] border border-white/10 rounded-lg p-2.5 text-white placeholder-white/20 focus:outline-none focus:border-primary text-[11px] leading-relaxed font-mono"
+                    />
+                  </div>
+                )}
+                <div className="space-y-1">
+                  <label className="block text-[11px] font-semibold text-white/70">
+                    {category === "Landscape Design" ? "Paving & Flooring" : "Interior Finishes – Floors"}
+                  </label>
+                  <textarea rows={3} value={matFloors} onChange={(e) => setMatFloors(e.target.value)}
+                    placeholder={"Marble Flooring (Entrance & Lobby)\nLarge Format Porcelain Tiles (Living)\nEngineered Wood (Bedrooms)"}
+                    className="w-full bg-[#1b271f] border border-white/10 rounded-lg p-2.5 text-white placeholder-white/20 focus:outline-none focus:border-primary text-[11px] leading-relaxed font-mono"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[11px] font-semibold text-white/70">
+                    {category === "Landscape Design" ? "Vertical Elements" : "Interior Finishes – Walls"}
+                  </label>
+                  <textarea rows={3} value={matWalls} onChange={(e) => setMatWalls(e.target.value)}
+                    placeholder={"Paint Finish (Warm White)\nWood Wall Paneling (Accent Walls)\nNatural Stone Veneer (Feature Walls)"}
+                    className="w-full bg-[#1b271f] border border-white/10 rounded-lg p-2.5 text-white placeholder-white/20 focus:outline-none focus:border-primary text-[11px] leading-relaxed font-mono"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[11px] font-semibold text-white/70">
+                    {category === "Landscape Design" ? "Overhead Structures" : "Ceiling & Lighting"}
+                  </label>
+                  <textarea rows={3} value={matCeiling} onChange={(e) => setMatCeiling(e.target.value)}
+                    placeholder={"False Ceiling with Cove Lighting\nWooden Ceiling Cladding\nRecessed LED Downlights"}
+                    className="w-full bg-[#1b271f] border border-white/10 rounded-lg p-2.5 text-white placeholder-white/20 focus:outline-none focus:border-primary text-[11px] leading-relaxed font-mono"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[11px] font-semibold text-white/70">
+                    {category === "Landscape Design" ? "Furniture & Structures" : "Joinery & Millwork"}
+                  </label>
+                  <textarea rows={3} value={matJoinery} onChange={(e) => setMatJoinery(e.target.value)}
+                    placeholder={"Wooden Doors & Frames\nBuilt-in Wardrobes (Wood Finish)\nKitchen Cabinetry (Matte Finish)"}
+                    className="w-full bg-[#1b271f] border border-white/10 rounded-lg p-2.5 text-white placeholder-white/20 focus:outline-none focus:border-primary text-[11px] leading-relaxed font-mono"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[11px] font-semibold text-white/70">
+                    {category === "Landscape Design" ? "Metalwork & Accessories" : "Metal & Glass Details"}
+                  </label>
+                  <textarea rows={3} value={matMetal} onChange={(e) => setMatMetal(e.target.value)}
+                    placeholder={"Black Metal Handrail\nBrass/Gold Metal Accents\nGlass Partition (Frameless)"}
+                    className="w-full bg-[#1b271f] border border-white/10 rounded-lg p-2.5 text-white placeholder-white/20 focus:outline-none focus:border-primary text-[11px] leading-relaxed font-mono"
+                  />
+                </div>
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="block text-[11px] font-semibold text-white/70">Sustainable Choices</label>
+                  <textarea rows={3} value={matSustainable} onChange={(e) => setMatSustainable(e.target.value)}
+                    placeholder={"Energy-efficient windows for better insulation\nNatural materials for a healthier environment\nLED lighting for energy savings"}
+                    className="w-full bg-[#1b271f] border border-white/10 rounded-lg p-2.5 text-white placeholder-white/20 focus:outline-none focus:border-primary text-[11px] leading-relaxed font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 6. TEAM & PUBLISHING SETTINGS */}
+          <div className="p-4 bg-[#162019] border border-white/8 rounded-xl space-y-3.5">
+            <h3 className="text-xs font-bold text-white/90 uppercase tracking-wider flex items-center gap-1.5 border-b border-white/6 pb-2">
+              <Users className="w-3.5 h-3.5 text-primary" /> Team Members &amp; Settings
+            </h3>
+
+            {/* Team Picker */}
+            <div className="space-y-2">
+              <label className="block text-[11px] font-semibold text-white/70">
+                Select Team Members on this Project ({selectedTeamIds.length} selected):
+              </label>
+
               {loadingTeam ? (
-                <div className="flex items-center justify-center py-6 gap-2 text-white/40">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-xs">Loading team members...</span>
+                <div className="py-4 text-center text-white/40">
+                  <Loader2 className="w-4 h-4 animate-spin mx-auto mb-1" />
+                  Loading team...
                 </div>
               ) : allTeamMembers.length === 0 ? (
-                <div className="text-center py-6 text-white/30 text-xs">
-                  <User className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                  No team members found. Add team members in the Team section first.
-                </div>
+                <div className="text-white/40 text-[11px] py-2">No team members added yet.</div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto no-scrollbar">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-44 overflow-y-auto no-scrollbar">
                   {allTeamMembers.map((member) => {
                     const isSelected = selectedTeamIds.includes(member.id);
                     return (
@@ -414,109 +783,79 @@ export default function ProjectFormModal({
                         key={member.id}
                         type="button"
                         onClick={() => toggleTeamMember(member.id)}
-                        className={`flex items-center gap-2.5 p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                        className={`flex items-center gap-2 p-2 rounded-lg border text-left transition-all cursor-pointer ${
                           isSelected
-                            ? "border-primary/50 bg-primary/10"
-                            : "border-white/10 bg-[#1c261f] hover:border-white/20"
+                            ? "bg-primary/20 border-primary text-white font-semibold"
+                            : "bg-[#1b271f] border-white/6 text-white/70 hover:border-white/15 hover:text-white"
                         }`}
                       >
-                        {/* Avatar */}
-                        <div className="relative w-9 h-9 rounded-full overflow-hidden flex-shrink-0 border border-white/10">
+                        <div className="relative w-6 h-6 rounded-full overflow-hidden shrink-0 border border-white/10">
                           <Image
                             src={member.imageUrl}
                             alt={member.name}
                             fill
-                            className="object-cover object-top"
+                            className="object-cover"
                           />
                         </div>
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <p className={`font-semibold text-[12px] truncate leading-tight ${isSelected ? "text-white" : "text-white/80"}`}>
-                            {member.name}
-                          </p>
-                          <p className="text-[10px] text-white/40 truncate leading-tight mt-0.5">
-                            {member.role}
-                          </p>
-                        </div>
-                        {/* Check indicator */}
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-all ${
-                          isSelected ? "bg-primary border-primary" : "border-white/20"
-                        }`}>
-                          {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
-                        </div>
+                        <span className="truncate text-[11px]">{member.name}</span>
+                        {isSelected && <Check className="w-3 h-3 text-primary ml-auto shrink-0" />}
                       </button>
                     );
                   })}
                 </div>
               )}
             </div>
-          </div>
 
-          <div>
-            <label className="block font-medium text-white/70 uppercase tracking-wider mb-1.5">
-              Project Description
-            </label>
-            <textarea
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of the design concept and architectural details..."
-              className="w-full bg-[#1c261f] border border-white/10 rounded-lg p-4 text-white focus:outline-none focus:border-primary transition-colors text-sm"
-            />
-          </div>
+            {/* Toggles */}
+            <div className="pt-2 border-t border-white/6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={featured}
+                  onChange={(e) => setFeatured(e.target.checked)}
+                  className="w-4 h-4 rounded border-white/20 bg-[#1b271f] text-primary focus:ring-primary"
+                />
+                <span className="text-white/80 text-xs">Feature on Homepage Carousel</span>
+              </label>
 
-          {/* Toggles */}
-          <div className="space-y-3 pt-2 pb-1">
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <input
-                type="checkbox"
-                id="featured"
-                checked={featured}
-                onChange={(e) => setFeatured(e.target.checked)}
-                className="w-4 h-4 rounded border-white/20 bg-[#1c261f] text-primary focus:ring-primary"
-              />
-              <span className="text-white/80 font-medium group-hover:text-white transition-colors">
-                Feature on Homepage Carousel
-              </span>
-            </label>
-
-            {/* Arsalan toggle */}
-            <label className={`flex items-center gap-3 cursor-pointer group p-3 rounded-xl border transition-all ${
-              isArsalan ? "bg-amber-500/10 border-amber-500/40" : "border-transparent"
-            }`}>
-              <input
-                type="checkbox"
-                id="isArsalan"
-                checked={isArsalan}
-                onChange={(e) => setIsArsalan(e.target.checked)}
-                className="w-4 h-4 rounded border-white/20 bg-[#1c261f] text-amber-500 focus:ring-amber-500"
-              />
-              <User className={`w-4 h-4 flex-shrink-0 ${isArsalan ? "text-amber-400" : "text-white/40"}`} />
-              <div>
-                <p className={`font-semibold ${isArsalan ? "text-amber-400" : "text-white/80"} transition-colors`}>
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isArsalan}
+                  onChange={(e) => setIsArsalan(e.target.checked)}
+                  className="w-4 h-4 rounded border-white/20 bg-[#1b271f] text-amber-500 focus:ring-amber-500"
+                />
+                <span className="text-amber-300 text-xs font-medium">
                   Add to Ar. Arsalan&apos;s Portfolio
-                </p>
-                <p className="text-white/40 text-[11px] mt-0.5">
-                  Shows this project on Arsalan&apos;s personal leadership portfolio page
-                </p>
-              </div>
-            </label>
+                </span>
+              </label>
+            </div>
           </div>
 
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-white/10">
+          {/* ── MODAL FOOTER ────────────────────────────────────── */}
+          <div className="pt-2 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-lg border border-white/10 text-white/70 hover:text-white text-xs font-semibold uppercase tracking-wider cursor-pointer"
+              className="px-4 py-2.5 rounded-xl border border-white/10 text-white/70 hover:text-white hover:bg-white/5 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
             >
               Cancel
             </button>
+
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer"
+              className="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-md shadow-primary/20 cursor-pointer disabled:opacity-50"
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Publish Project"}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Publishing...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" /> Publish Project
+                </>
+              )}
             </button>
           </div>
         </form>
@@ -524,3 +863,6 @@ export default function ProjectFormModal({
     </div>
   );
 }
+
+
+

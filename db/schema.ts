@@ -65,7 +65,10 @@ export const projects = pgTable("projects", {
   year: text("year"),
   coverImage: text("cover_image").notNull(),
   galleryImages: text("gallery_images").default("[]"), // JSON array of up to 5 uploaded gallery image URLs
+  spaceNames: text("space_names").default("[]"), // JSON array of up to 5 names for gallery images
+  drawingImages: text("drawing_images").default("[]"), // JSON array of up to 3 uploaded architectural/landscape drawing image URLs
   teamMembers: text("team_members").default("[]"), // JSON array of selected team member IDs
+  materialsData: text("materials_data"), // JSON: structured materials & finishes data { concept, quote, exteriorFinishes[], interiorFloors[], interiorWalls[], ceilingLighting[], joineryMillwork[], metalGlass[], sustainableChoices[] }
   description: text("description"),
   tagline: text("tagline"),        // Short punchy hero subtitle (e.g. "Realistic. Detailed. Inspiring.")
   plotSize: text("plot_size"),     // e.g. "10 Marla", "1 Kanal"
@@ -73,6 +76,9 @@ export const projects = pgTable("projects", {
   floors: text("floors"),          // e.g. "G+1", "G+3"
   scope: text("scope"),            // e.g. "Exterior Visualization", "Interior Design"
   status: text("status"),          // e.g. "Completed (2025)", "Ongoing"
+  duration: text("duration"),      // e.g. "18 Months", "10 Months"
+  structure: text("structure"),    // e.g. "RCC Frame Structure", "Post-Tensioned"
+  constructionType: text("construction_type"), // e.g. "Commercial High-Rise", "Residential Villa"
   featured: boolean("featured").default(false),
   isArsalan: boolean("is_arsalan").default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
