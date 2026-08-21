@@ -246,46 +246,33 @@ export default async function Home() {
           </div>
           
           {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto pb-4 snap-x">
-            {featuredProjects.length > 0 ? (
-              featuredProjects.map((project) => (
-                <div key={project.slug} className="snap-start min-w-[280px]">
-                  <ProjectCard
-                    title={project.title}
-                    category={project.category}
-                    location={project.location ?? undefined}
-                    imageUrl={project.coverImage}
-                    href={`/portfolio/${project.slug}`}
-                  />
-                </div>
-              ))
-            ) : (
-              /* Placeholder cards when DB is empty */
-              [
-                { title: "10 Marla Residence", category: "Architecture", location: "Peshawar", imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80" },
-                { title: "Mixed-Use Development", category: "Commercial", location: "Peshawar", imageUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80" },
-                { title: "Luxury Interior", category: "Interior Design", location: "Peshawar", imageUrl: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&q=80" },
-                { title: "Landscape Design", category: "Landscape Design", location: "Peshawar Cantonment", imageUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80" },
-              ].map((project) => (
-                <div key={project.title} className="snap-start min-w-[280px]">
-                  <ProjectCard
-                    title={project.title}
-                    category={project.category}
-                    location={project.location}
-                    imageUrl={project.imageUrl}
-                    href="/portfolio"
-                  />
-                </div>
-              ))
-            )}
-          </div>
-          
-          {/* Decorative Carousel Dots */}
-          <div className="flex justify-center mt-12 space-x-2.5">
-             <div className="w-2 h-2 rounded-full bg-primary" />
-             <div className="w-2 h-2 rounded-full bg-medium-gray/40" />
-             <div className="w-2 h-2 rounded-full bg-medium-gray/40" />
-          </div>
+          {featuredProjects.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto pb-4 snap-x">
+                {featuredProjects.map((project) => (
+                  <div key={project.slug} className="snap-start min-w-[280px]">
+                    <ProjectCard
+                      title={project.title}
+                      category={project.category}
+                      location={project.location ?? undefined}
+                      imageUrl={project.coverImage}
+                      href={`/portfolio/${project.slug}`}
+                    />
+                  </div>
+                ))}
+              </div>
+              {/* Decorative Carousel Dots */}
+              <div className="flex justify-center mt-12 space-x-2.5">
+                <div className="w-2 h-2 rounded-full bg-primary" />
+                <div className="w-2 h-2 rounded-full bg-medium-gray/40" />
+                <div className="w-2 h-2 rounded-full bg-medium-gray/40" />
+              </div>
+            </>
+          ) : (
+            <div className="py-12 text-center bg-[#f8f9f8] rounded-xl border border-dashed border-charcoal/10">
+              <p className="text-dark-gray/60 text-sm">No featured projects available yet.</p>
+            </div>
+          )}
 
           <div className="mt-8 text-center md:hidden flex justify-center">
             <a href="/portfolio" className="flex items-center text-[12px] font-bold text-charcoal tracking-widest uppercase relative after:content-[''] after:absolute after:-bottom-3 after:left-0 after:w-full after:h-[2px] after:bg-primary/30 hover:after:bg-primary transition-all">

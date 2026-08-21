@@ -169,12 +169,7 @@ export default async function ServiceDetailPage({
     }
   } catch {}
 
-  // If no DB rows, fall back to predefined projects for that category
-  if (categoryProjects.length === 0) {
-    categoryProjects = allProjects
-      .filter((p) => p.category === service.projectCategory)
-      .slice(0, 4);
-  }
+  // Only display projects fetched from DB
 
   return (
     <>

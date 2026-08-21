@@ -2823,10 +2823,17 @@ export default function ProjectDetailClient({ project }: { project: ProjectDetai
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
               <div className="space-y-5">
-                <h3 className="text-xl font-bold text-charcoal">Contextual Modernism</h3>
+                <h3 className="text-xl font-bold text-charcoal">
+                  {project.tagline || (isLandscape ? "Ecological Landscape Masterplan" : project.category.toLowerCase().includes("interior") ? "Curated Spatial Harmony" : "Contextual Modernism")}
+                </h3>
                 <p className="text-dark-gray text-xs md:text-sm leading-relaxed">
-                  {project.conceptText ||
-                    "Our architectural vision for this residence emerged from the dialogue between clean contemporary geometry and local climatic needs. Deep overhangs protect the interior from harsh summer sun while wide apertures invite morning breezes."}
+                  {project.description ||
+                    project.conceptText ||
+                    (isLandscape
+                      ? "Our landscape masterplan establishes a living dialogue between organic terrain, native flora, and community gathering nodes."
+                      : project.category.toLowerCase().includes("interior")
+                      ? "Our interior architecture approach crafts a seamless narrative of light, tactile materials, and spatial elegance tailored for refined living."
+                      : "Our architectural vision for this project emerged from the dialogue between clean contemporary geometry and local environmental needs.")}
                 </p>
                 <div className="space-y-3 pt-2">
                   <div className="flex items-start gap-3">

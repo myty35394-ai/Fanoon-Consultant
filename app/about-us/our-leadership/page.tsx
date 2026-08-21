@@ -55,33 +55,6 @@ const journey = [
   },
 ];
 
-const portfolioFallback = [
-  {
-    title: "Cantt Heights",
-    category: "Mixed-use Development",
-    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80",
-    href: "/about-us/our-leadership/portfolio",
-  },
-  {
-    title: "Green Heights",
-    category: "Mixed-use Development",
-    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80",
-    href: "/about-us/our-leadership/portfolio",
-  },
-  {
-    title: "Peshawar Cantonment",
-    category: "Beautification Project",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-    href: "/about-us/our-leadership/portfolio",
-  },
-  {
-    title: "Green Belt Development",
-    category: "Landscape & Public Spaces",
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80",
-    href: "/about-us/our-leadership/portfolio",
-  },
-];
-
 export default async function LeadershipProfilePage() {
   // Fetch up to 4 of Arsalan's portfolio projects from DB
   let portfolioItems: { title: string; category: string; image: string; href: string }[] = [];
@@ -100,13 +73,8 @@ export default async function LeadershipProfilePage() {
         image: p.coverImage,
         href: `/portfolio/${p.slug}`,
       }));
-    } else {
-      // Fall back to static placeholders while DB is empty
-      portfolioItems = portfolioFallback;
     }
-  } catch {
-    portfolioItems = portfolioFallback;
-  }
+  } catch {}
 
   return (
     <>
@@ -399,27 +367,33 @@ export default async function LeadershipProfilePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {portfolioItems.map((item, i) => (
-              <Link key={i} href={item.href} className="group cursor-pointer block">
-                <div className="relative w-full aspect-[4/3] overflow-hidden rounded-[10px] mb-3">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
-                  {/* Category badge */}
-                  <span className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-primary text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    {item.category}
-                  </span>
-                </div>
-                <h4 className="text-charcoal font-bold text-[14px] mb-0.5 group-hover:text-primary transition-colors">{item.title}</h4>
-                <p className="text-dark-gray/60 text-[12px]">{item.category}</p>
-              </Link>
-            ))}
-          </div>
+          {portfolioItems.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {portfolioItems.map((item, i) => (
+                <Link key={i} href={item.href} className="group cursor-pointer block">
+                  <div className="relative w-full aspect-[4/3] overflow-hidden rounded-[10px] mb-3">
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
+                    {/* Category badge */}
+                    <span className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-primary text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      {item.category}
+                    </span>
+                  </div>
+                  <h4 className="text-charcoal font-bold text-[14px] mb-0.5 group-hover:text-primary transition-colors">{item.title}</h4>
+                  <p className="text-dark-gray/60 text-[12px]">{item.category}</p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center bg-[#f8f9f8] rounded-xl border border-dashed border-charcoal/10">
+              <p className="text-dark-gray/60 text-sm">No leadership portfolio highlights published yet.</p>
+            </div>
+          )}
         </div>
       </section>
 
