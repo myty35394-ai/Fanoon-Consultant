@@ -79,6 +79,11 @@ export default function ProjectFormModal({
   const [featured, setFeatured] = useState(false);
   const [isArsalan, setIsArsalan] = useState(defaultTab === "arsalan");
 
+  // Design Concept State (for Architecture, Interior, Landscape)
+  const [conceptTitle, setConceptTitle] = useState("");
+  const [conceptDescription, setConceptDescription] = useState("");
+  const [conceptFeatures, setConceptFeatures] = useState("");
+
   // Materials & Finishes State (for Architecture, Interior, Landscape)
   const [matConcept, setMatConcept] = useState("");
   const [matQuote, setMatQuote] = useState("");
@@ -151,6 +156,11 @@ export default function ProjectFormModal({
     );
   };
 
+  const isConceptSupported =
+    category === "Architecture" ||
+    category === "Interior Design" ||
+    category === "Landscape Design";
+
   const isDrawingSupported =
     category === "Architecture" ||
     category === "Interior Design" ||
@@ -176,6 +186,13 @@ export default function ProjectFormModal({
 
     setLoading(true);
     setError("");
+
+    // Build conceptData JSON if applicable
+    const conceptData = isConceptSupported && (conceptTitle.trim() || conceptDescription.trim() || splitLines(conceptFeatures).length) ? {
+      title: conceptTitle.trim() || undefined,
+      description: conceptDescription.trim() || undefined,
+      features: splitLines(conceptFeatures).length ? splitLines(conceptFeatures) : undefined,
+    } : undefined;
 
     // Build materialsData JSON if applicable
     const materialsData = isMaterialsSupported ? {
@@ -214,6 +231,7 @@ export default function ProjectFormModal({
           drawingImages: isDrawingSupported ? drawingImages.filter(Boolean) : [],
           teamMembers: selectedTeamIds,
           description: description.trim() || null,
+          conceptData: conceptData ? JSON.stringify(conceptData) : null,
           materialsData: materialsData ? JSON.stringify(materialsData) : null,
           featured,
           isArsalan,
@@ -247,6 +265,7 @@ export default function ProjectFormModal({
         setSelectedTeamIds([]);
         setFeatured(false);
         setIsArsalan(defaultTab === "arsalan");
+        setConceptTitle(""); setConceptDescription(""); setConceptFeatures("");
         setMatConcept(""); setMatQuote(""); setMatExterior(""); setMatFloors("");
         setMatWalls(""); setMatCeiling(""); setMatJoinery(""); setMatMetal(""); setMatSustainable("");
       }
@@ -651,7 +670,61 @@ export default function ProjectFormModal({
             )}
           </div>
 
-          {/* 5. MATERIALS & FINISHES (Architecture, Interior, Landscape only) */}
+          {/* 5. DESIGN CONCEPT & PHILOSOPHY (Architecture, Interior, Landscape only) */}
+          {isConceptSupported && (
+            <div className="p-4 bg-[#162019] border border-white/8 rounded-xl space-y-4">
+              <div className="border-b border-white/6 pb-2 flex items-start justify-between">
+                <h3 className="text-xs font-bold text-white/90 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-primary" /> Design Concept &amp; Philosophy
+                </h3>
+                <span className="text-[10px] text-white/40 italic">Optional — leave blank to use smart defaults</span>
+              </div>
+
+              {/* Concept Title / Philosophy Heading */}
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-white/70">
+                  Concept Title / Philosophy Heading
+                </label>
+                <input
+                  type="text"
+                  value={conceptTitle}
+                  onChange={(e) => setConceptTitle(e.target.value)}
+                  placeholder="e.g. Contextual Modernism / Curated Spatial Harmony"
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg px-3.5 py-2.5 text-white placeholder-white/25 focus:outline-none focus:border-primary text-xs"
+                />
+              </div>
+
+              {/* Concept Narrative / Description */}
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-white/70">
+                  Design Narrative &amp; Concept Description
+                </label>
+                <textarea
+                  rows={3}
+                  value={conceptDescription}
+                  onChange={(e) => setConceptDescription(e.target.value)}
+                  placeholder="Explain the architectural/interior concept, daylight orientation, spatial zoning, and design philosophy..."
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg p-3 text-white placeholder-white/25 focus:outline-none focus:border-primary text-xs leading-relaxed"
+                />
+              </div>
+
+              {/* Key Features & Highlights */}
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-white/70">
+                  Key Design Features &amp; Highlights (1 per line)
+                </label>
+                <textarea
+                  rows={3}
+                  value={conceptFeatures}
+                  onChange={(e) => setConceptFeatures(e.target.value)}
+                  placeholder={"Spacious open-plan living and dining area\nCustom joinery and premium finishes\nLayered architectural lighting\nInternal landscaped light court"}
+                  className="w-full bg-[#1b271f] border border-white/10 rounded-lg p-2.5 text-white placeholder-white/20 focus:outline-none focus:border-primary text-[11px] leading-relaxed font-mono"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* 6. MATERIALS & FINISHES (Architecture, Interior, Landscape only) */}
           {isMaterialsSupported && (
             <div className="p-4 bg-[#162019] border border-white/8 rounded-xl space-y-4">
               <div className="border-b border-white/6 pb-2 flex items-start justify-between">
@@ -755,10 +828,10 @@ export default function ProjectFormModal({
             </div>
           )}
 
-          {/* 6. TEAM & PUBLISHING SETTINGS */}
+          {/* 7. TEAM & PUBLISHING SETTINGS */}
           <div className="p-4 bg-[#162019] border border-white/8 rounded-xl space-y-3.5">
             <h3 className="text-xs font-bold text-white/90 uppercase tracking-wider flex items-center gap-1.5 border-b border-white/6 pb-2">
-              <Users className="w-3.5 h-3.5 text-primary" /> Team Members &amp; Settings
+              <Users className="w-3.5 h-3.5 text-primary" /> 7. Team Members &amp; Settings
             </h3>
 
             {/* Team Picker */}

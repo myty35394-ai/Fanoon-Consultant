@@ -18,11 +18,11 @@ export const metadata: Metadata = {
 };
 
 const stats = [
-  { icon: Building2, number: "100+", label: "Projects Completed" },
-  { icon: Award, number: "12+", label: "Years of Experience" },
-  { icon: Trophy, number: "25+", label: "Awards & Recognition" },
-  { icon: Globe, number: "3", label: "Countries Worked In" },
-  { icon: Users, number: "50+", label: "Happy Clients" },
+  { icon: Building2, number: "150+", label: "Projects Completed" },
+  { icon: Users, number: "80+", label: "Happy Clients" },
+  { icon: Award, number: "10+", label: "Years of Experience" },
+  { icon: Trophy, number: "25+", label: "Awards & Recognitions" },
+  { icon: Globe, number: "3+", label: "Countries Worked In" },
 ];
 
 export default async function LeadershipPortfolioPage() {

@@ -438,8 +438,42 @@ export default async function ProjectDetailPage({
           "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80",
           "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80",
         ],
-        features: fallback.features,
-        conceptText: p.description || fallback.conceptText,
+        features: (() => {
+          if (p.conceptData) {
+            try {
+              const c = JSON.parse(p.conceptData);
+              if (Array.isArray(c.features) && c.features.length > 0) return c.features;
+            } catch {}
+          }
+          return fallback.features;
+        })(),
+        conceptText: (() => {
+          if (p.conceptData) {
+            try {
+              const c = JSON.parse(p.conceptData);
+              if (c.description) return c.description;
+            } catch {}
+          }
+          return p.description || fallback.conceptText;
+        })(),
+        conceptTitle: (() => {
+          if (p.conceptData) {
+            try {
+              const c = JSON.parse(p.conceptData);
+              if (c.title) return c.title;
+            } catch {}
+          }
+          return p.tagline || undefined;
+        })(),
+        conceptPillars: (() => {
+          if (p.conceptData) {
+            try {
+              const c = JSON.parse(p.conceptData);
+              if (Array.isArray(c.strategies) && c.strategies.length > 0) return c.strategies;
+            } catch {}
+          }
+          return undefined;
+        })(),
         overviewText1: p.description || fallback.overviewText1,
         overviewText2: fallback.overviewText2,
         featureBedroomImage: fallback.featureBedroomImage,

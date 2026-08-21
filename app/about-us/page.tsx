@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { 
   Building2, Users, Award, Target, Gem, Check, 
-  MapPin, Trees, Sparkles, Play, Eye, ArrowRight
+  MapPin, Trees, Sparkles, Play, Eye, ArrowRight, Trophy
 } from "lucide-react";
 
 import Button from "@/components/ui/Button";
@@ -138,10 +138,10 @@ export default async function AboutUsPage() {
               {/* Stats Row */}
               <div className="flex flex-wrap gap-x-8 gap-y-6">
                 {[
-                  { Icon: Building2, number: '50+', label: 'PROJECTS\nCOMPLETED' },
-                  { Icon: Users,     number: '30+', label: 'HAPPY\nCLIENTS' },
-                  { Icon: Award,     number: '5+',  label: 'YEARS OF\nEXPERIENCE' },
-                  { Icon: Users,     number: '15+', label: 'PROFESSIONALS &\nPROJECT EXPERTS' },
+                  { Icon: Building2, number: '150+', label: 'PROJECTS\nCOMPLETED' },
+                  { Icon: Users,     number: '80+',  label: 'HAPPY\nCLIENTS' },
+                  { Icon: Award,     number: '10+',  label: 'YEARS OF\nEXPERIENCE' },
+                  { Icon: Trophy,    number: '25+',  label: 'AWARDS &\nRECOGNITIONS' },
                 ].map(({ Icon, number, label }, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <Icon className="w-9 h-9 text-primary flex-shrink-0" strokeWidth={1.2} />

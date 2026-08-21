@@ -176,14 +176,14 @@ export default function OurStoryPage() {
             By the Numbers
           </h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-0">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-0">
             {/* Stat 1 */}
             <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:px-6 pt-6 md:pt-0 first:pt-0 first:px-0 text-center md:text-left relative">
               <div className="text-primary flex-shrink-0">
                 <Building2 className="w-10 h-10" strokeWidth={1.5} />
               </div>
               <div>
-                <div className="text-white font-bold text-[32px] leading-none mb-1">100+</div>
+                <div className="text-white font-bold text-[32px] leading-none mb-1">150+</div>
                 <div className="text-white/60 text-[12px] uppercase tracking-widest font-medium">Projects Completed</div>
               </div>
               <div className="hidden md:block absolute right-0 top-[20%] bottom-[20%] w-[1px] bg-gradient-to-b from-transparent via-white/30 to-transparent" />
@@ -195,7 +195,7 @@ export default function OurStoryPage() {
                 <Users className="w-10 h-10" strokeWidth={1.5} />
               </div>
               <div>
-                <div className="text-white font-bold text-[32px] leading-none mb-1">50+</div>
+                <div className="text-white font-bold text-[32px] leading-none mb-1">80+</div>
                 <div className="text-white/60 text-[12px] uppercase tracking-widest font-medium">Happy Clients</div>
               </div>
               <div className="hidden md:block absolute right-0 top-[20%] bottom-[20%] w-[1px] bg-gradient-to-b from-transparent via-white/30 to-transparent" />
@@ -204,11 +204,11 @@ export default function OurStoryPage() {
             {/* Stat 3 */}
             <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:px-6 pt-6 md:pt-0 text-center md:text-left relative">
               <div className="text-primary flex-shrink-0">
-                <MapPin className="w-10 h-10" strokeWidth={1.5} />
+                <Medal className="w-10 h-10" strokeWidth={1.5} />
               </div>
               <div>
                 <div className="text-white font-bold text-[32px] leading-none mb-1">10+</div>
-                <div className="text-white/60 text-[12px] uppercase tracking-widest font-medium">Cities Served</div>
+                <div className="text-white/60 text-[12px] uppercase tracking-widest font-medium">Years of Experience</div>
               </div>
               <div className="hidden md:block absolute right-0 top-[20%] bottom-[20%] w-[1px] bg-gradient-to-b from-transparent via-white/30 to-transparent" />
             </div>
@@ -216,23 +216,11 @@ export default function OurStoryPage() {
             {/* Stat 4 */}
             <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:px-6 pt-6 md:pt-0 text-center md:text-left relative">
               <div className="text-primary flex-shrink-0">
-                <Users className="w-10 h-10" strokeWidth={1.5} />
+                <Trophy className="w-10 h-10" strokeWidth={1.5} />
               </div>
               <div>
                 <div className="text-white font-bold text-[32px] leading-none mb-1">25+</div>
-                <div className="text-white/60 text-[12px] uppercase tracking-widest font-medium">Team Members</div>
-              </div>
-              <div className="hidden md:block absolute right-0 top-[20%] bottom-[20%] w-[1px] bg-gradient-to-b from-transparent via-white/30 to-transparent" />
-            </div>
-
-            {/* Stat 5 */}
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:px-6 pt-6 md:pt-0 text-center md:text-left relative">
-              <div className="text-primary flex-shrink-0">
-                <Medal className="w-10 h-10" strokeWidth={1.5} />
-              </div>
-              <div>
-                <div className="text-white font-bold text-[32px] leading-none mb-1">5+</div>
-                <div className="text-white/60 text-[12px] uppercase tracking-widest font-medium">Years of Excellence</div>
+                <div className="text-white/60 text-[12px] uppercase tracking-widest font-medium">Awards & Recognitions</div>
               </div>
             </div>
           </div>

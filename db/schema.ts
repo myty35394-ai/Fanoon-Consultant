@@ -69,6 +69,7 @@ export const projects = pgTable("projects", {
   drawingImages: text("drawing_images").default("[]"), // JSON array of up to 3 uploaded architectural/landscape drawing image URLs
   teamMembers: text("team_members").default("[]"), // JSON array of selected team member IDs
   materialsData: text("materials_data"), // JSON: structured materials & finishes data { concept, quote, exteriorFinishes[], interiorFloors[], interiorWalls[], ceilingLighting[], joineryMillwork[], metalGlass[], sustainableChoices[] }
+  conceptData: text("concept_data"), // JSON: { title, description, features: string[], strategies: { title: string, desc: string }[] }
   description: text("description"),
   tagline: text("tagline"),        // Short punchy hero subtitle (e.g. "Realistic. Detailed. Inspiring.")
   plotSize: text("plot_size"),     // e.g. "10 Marla", "1 Kanal"

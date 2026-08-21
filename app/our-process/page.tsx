@@ -15,7 +15,8 @@ import {
   ClipboardList,
   HardHat,
   CalendarCheck,
-  Award, // Using Award as alternative to ShieldCheck for stats if needed
+  Award,
+  Building2,
   ChevronRight,
   ArrowRight,
 } from "lucide-react";
@@ -309,8 +310,8 @@ export default function OurProcessPage() {
               <div className="py-12 lg:py-20 px-2 sm:px-6 flex items-center justify-center">
                 <StatItem
                   theme="dark"
-                  icon={<Users />}
-                  number="100+"
+                  icon={<Building2 />}
+                  number="150+"
                   label="Projects Completed"
                   labelPosition="after"
                 />

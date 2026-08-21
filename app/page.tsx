@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { 
   Building2, Sofa, Trees, Box, ClipboardList, HardHat, 
-  MessageSquare, Search, FileText, Eye, Check, CheckCircle2, Users, Award, ArrowRight
+  MessageSquare, Search, FileText, Eye, Check, CheckCircle2, Users, Award, ArrowRight, Trophy
 } from "lucide-react";
 
 import Button from "@/components/ui/Button";
@@ -15,7 +15,7 @@ import CircularProgress from "@/components/ui/CircularProgress";
 import HeroSlider from "@/components/home/HeroSlider";
 import CtaBanner from "@/components/shared/CtaBanner";
 import { db } from "@/db";
-import { projects } from "@/db/schema";
+import { projects, siteSettings } from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 
 export const metadata: Metadata = {
@@ -59,7 +59,29 @@ export default async function Home() {
     console.error("Failed to fetch featured projects:", err);
   }
 
+  // Fetch social links from site settings
+  let socialLinks = {
+    facebookUrl: "https://facebook.com",
+    instagramUrl: "https://instagram.com",
+    linkedinUrl: "https://linkedin.com",
+    twitterUrl: "https://x.com",
+  };
+  try {
+    const [settings] = await db.select().from(siteSettings).limit(1);
+    if (settings) {
+      socialLinks = {
+        facebookUrl: settings.facebookUrl || socialLinks.facebookUrl,
+        instagramUrl: settings.instagramUrl || socialLinks.instagramUrl,
+        linkedinUrl: settings.linkedinUrl || socialLinks.linkedinUrl,
+        twitterUrl: settings.twitterUrl || socialLinks.twitterUrl,
+      };
+    }
+  } catch (err) {
+    console.error("Failed to fetch site settings:", err);
+  }
+
   // 3. Services Data
+
   const services = [
     {
       title: "Architecture Design",
@@ -120,7 +142,7 @@ export default async function Home() {
   return (
     <>
       {/* 1. Hero Section */}
-      <HeroSlider />
+      <HeroSlider socialLinks={socialLinks} />
 
       {/* 2. Who We Are */}
       <section className="bg-white py-24 overflow-hidden">
@@ -352,10 +374,10 @@ export default async function Home() {
             <div className="w-full lg:w-1/2 lg:pl-12">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {[
-                  { icon: <Building2 className="w-12 h-12 text-primary" strokeWidth={1} />, number: "50+", label: "Projects Completed" },
-                  { icon: <Users className="w-12 h-12 text-primary" strokeWidth={1} />, number: "30+", label: "Happy Clients" },
-                  { icon: <Award className="w-12 h-12 text-primary" strokeWidth={1} />, number: "5+", label: "Years of Experience" },
-                  { icon: <Users className="w-12 h-12 text-primary" strokeWidth={1} />, number: "15+", label: "Professionals" },
+                  { icon: <Building2 className="w-12 h-12 text-primary" strokeWidth={1} />, number: "150+", label: "Projects Completed" },
+                  { icon: <Users className="w-12 h-12 text-primary" strokeWidth={1} />, number: "80+", label: "Happy Clients" },
+                  { icon: <Award className="w-12 h-12 text-primary" strokeWidth={1} />, number: "10+", label: "Years of Experience" },
+                  { icon: <Trophy className="w-12 h-12 text-primary" strokeWidth={1} />, number: "25+", label: "Awards & Recognitions" },
                 ].map((stat, idx) => (
                   <StatItem
                     key={idx}

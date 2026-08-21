@@ -58,6 +58,7 @@ import {
   Zap,
   BarChart3,
   FileCheck,
+  Trophy,
   Check,
   Box,
   Camera,
@@ -105,6 +106,7 @@ export interface ProjectDetailData {
   drawingImages?: string[];
   features?: string[];
   conceptPillars?: { title: string; desc?: string }[];
+  conceptTitle?: string;
   conceptText?: string;
   overviewText1?: string;
   overviewText2?: string;
@@ -151,18 +153,18 @@ function ProjectTeamSection({ selectedTeam }: { selectedTeam?: SelectedTeamMembe
           <div className="grid grid-cols-2 gap-3.5 pt-2">
             <div className="bg-[#fafcfa] border border-[#e5ece7] rounded-xl p-4 space-y-1">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-1">
-                <Users className="w-4 h-4" />
+                <Building2 className="w-4 h-4" />
               </div>
-              <span className="text-xl font-extrabold text-charcoal block leading-none">20+</span>
-              <span className="text-[11px] text-dark-gray/70 font-medium">Team Members</span>
+              <span className="text-xl font-extrabold text-charcoal block leading-none">150+</span>
+              <span className="text-[11px] text-dark-gray/70 font-medium">Projects Completed</span>
             </div>
 
             <div className="bg-[#fafcfa] border border-[#e5ece7] rounded-xl p-4 space-y-1">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-1">
-                <TrendingUp className="w-4 h-4" />
+                <Users className="w-4 h-4" />
               </div>
-              <span className="text-xl font-extrabold text-charcoal block leading-none">200+</span>
-              <span className="text-[11px] text-dark-gray/70 font-medium">Projects Completed</span>
+              <span className="text-xl font-extrabold text-charcoal block leading-none">80+</span>
+              <span className="text-[11px] text-dark-gray/70 font-medium">Happy Clients</span>
             </div>
 
             <div className="bg-[#fafcfa] border border-[#e5ece7] rounded-xl p-4 space-y-1">
@@ -175,10 +177,10 @@ function ProjectTeamSection({ selectedTeam }: { selectedTeam?: SelectedTeamMembe
 
             <div className="bg-[#fafcfa] border border-[#e5ece7] rounded-xl p-4 space-y-1">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-1">
-                <HardHat className="w-4 h-4" />
+                <Trophy className="w-4 h-4" />
               </div>
-              <span className="text-xl font-extrabold text-charcoal block leading-none">100%</span>
-              <span className="text-[11px] text-dark-gray/70 font-medium">Client Satisfaction</span>
+              <span className="text-xl font-extrabold text-charcoal block leading-none">25+</span>
+              <span className="text-[11px] text-dark-gray/70 font-medium">Awards &amp; Recognitions</span>
             </div>
           </div>
         </div>
@@ -2824,11 +2826,11 @@ export default function ProjectDetailClient({ project }: { project: ProjectDetai
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
               <div className="space-y-5">
                 <h3 className="text-xl font-bold text-charcoal">
-                  {project.tagline || (isLandscape ? "Ecological Landscape Masterplan" : project.category.toLowerCase().includes("interior") ? "Curated Spatial Harmony" : "Contextual Modernism")}
+                  {project.conceptTitle || project.tagline || (isLandscape ? "Ecological Landscape Masterplan" : project.category.toLowerCase().includes("interior") ? "Curated Spatial Harmony" : "Contextual Modernism")}
                 </h3>
                 <p className="text-dark-gray text-xs md:text-sm leading-relaxed">
-                  {project.description ||
-                    project.conceptText ||
+                  {project.conceptText ||
+                    project.description ||
                     (isLandscape
                       ? "Our landscape masterplan establishes a living dialogue between organic terrain, native flora, and community gathering nodes."
                       : project.category.toLowerCase().includes("interior")

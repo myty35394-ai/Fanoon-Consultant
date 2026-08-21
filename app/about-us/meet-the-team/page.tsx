@@ -2,7 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Users, HardHat, Building2, Award } from "lucide-react";
+import { ArrowRight, Users, HardHat, Building2, Award, Trophy } from "lucide-react";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { db } from "@/db";
 import { teamMembers } from "@/db/schema";
@@ -15,10 +15,10 @@ export const metadata: Metadata = {
 };
 
 const stats = [
-  { icon: Users, number: "25+", label: "Team Members" },
-  { icon: HardHat, number: "10+", label: "Design Disciplines" },
-  { icon: Building2, number: "100+", label: "Projects Completed" },
-  { icon: Award, number: "5+", label: "Years of Excellence" },
+  { icon: Building2, number: "150+", label: "Projects Completed" },
+  { icon: Users, number: "80+", label: "Happy Clients" },
+  { icon: Award, number: "10+", label: "Years of Experience" },
+  { icon: Trophy, number: "25+", label: "Awards & Recognitions" },
 ];
 
 const teamCategories = [

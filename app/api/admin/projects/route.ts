@@ -42,6 +42,7 @@ export async function POST(req: Request) {
       structure,
       constructionType,
       materialsData,
+      conceptData,
       spaceNames,
     } = body;
 
@@ -82,6 +83,7 @@ export async function POST(req: Request) {
         structure: structure || null,
         constructionType: constructionType || null,
         materialsData: materialsData ? (typeof materialsData === "string" ? materialsData : JSON.stringify(materialsData)) : null,
+        conceptData: conceptData ? (typeof conceptData === "string" ? conceptData : JSON.stringify(conceptData)) : null,
         spaceNames: Array.isArray(spaceNames) ? JSON.stringify(spaceNames.slice(0, 5)) : typeof spaceNames === "string" ? spaceNames : "[]",
         featured: Boolean(featured),
         isArsalan: Boolean(isArsalan),
