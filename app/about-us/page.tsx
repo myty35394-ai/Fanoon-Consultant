@@ -34,7 +34,7 @@ export default async function AboutUsPage() {
         {/* Background Photo */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1920&q=80"
+            src="/about us.jpeg"
             alt="Fanoon Consultants — Modern Architecture"
             fill
             className="object-cover object-center"

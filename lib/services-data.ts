@@ -48,7 +48,7 @@ export const servicesData: ServiceDetail[] = [
       "Our designs are driven by a deep understanding of context, user needs and future growth, ensuring every project we create stands the test of time.",
     ],
     introImage:
-      "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80",
+      "/Architectural Design.jpeg",
     pillars: [
       { icon: MapPin, label: "Contextual Design" },
       { icon: Lightbulb, label: "Innovative & Functional" },
@@ -181,7 +181,7 @@ export const servicesData: ServiceDetail[] = [
       "From material selection to custom furnishings, we handle every detail.",
     ],
     introImage:
-      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&q=80",
+      "/interior design.jpeg",
     pillars: [
       { icon: Sofa, label: "Custom Furnishings" },
       { icon: Lightbulb, label: "Lighting Design" },
@@ -322,7 +322,7 @@ export const servicesData: ServiceDetail[] = [
       "Our proactive approach mitigates risks before they become issues.",
     ],
     introImage:
-      "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=80",
+      "/Project Management.jpeg",
     pillars: [
       { icon: ClipboardList, label: "Planning" },
       { icon: Calculator, label: "Cost Control" },
@@ -369,7 +369,7 @@ export const servicesData: ServiceDetail[] = [
       "We catch errors early, preventing costly rework and ensuring the final product meets your expectations.",
     ],
     introImage:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80",
+      "/Construction Supervision.jpeg",
     pillars: [
       { icon: HardHat, label: "Site Safety" },
       { icon: CheckCircle2, label: "Quality Control" },

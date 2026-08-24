@@ -131,7 +131,7 @@ export default async function CareersPage() {
         {/* Background Image on Right */}
         <div className="absolute top-0 bottom-0 right-0 w-full lg:w-[65%] z-0">
           <Image
-            src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1920&q=80"
+            src="/Careers.jpeg"
             alt="Fanoon Team Collaborating"
             fill
             className="object-cover object-center"

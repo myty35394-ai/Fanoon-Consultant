@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     images: [
       {
-        url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
+        url: "/1.jpeg",
         width: 1200,
         height: 630,
         alt: "Fanoon Consultants Hero Image",

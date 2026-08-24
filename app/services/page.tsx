@@ -28,7 +28,7 @@ const services = [
       "Innovative architectural solutions that balance aesthetics, functionality, and sustainability while reflecting your vision and context.",
     icon: <Building2 />,
     imageUrl:
-      "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80",
+      "/Architectural Design.jpeg",
     href: "/services/architecture-design",
   },
   {
@@ -38,7 +38,7 @@ const services = [
       "Creating elegant and functional interiors that enhance user experience and bring spaces to life with creativity and detail.",
     icon: <Sofa />,
     imageUrl:
-      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80",
+      "/interior design.jpeg",
     href: "/services/interior-design",
   },
   {
@@ -68,7 +68,7 @@ const services = [
       "Efficient planning, coordination, and management to ensure projects are delivered on time, within scope and budget.",
     icon: <ClipboardList />,
     imageUrl:
-      "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&q=80",
+      "/Project Management.jpeg",
     href: "/services/project-management",
   },
   {
@@ -78,7 +78,7 @@ const services = [
       "Professional site supervision ensuring quality, safety, and compliance at every stage of construction.",
     icon: <HardHat />,
     imageUrl:
-      "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80",
+      "/Construction Supervision.jpeg",
     href: "/services/construction-supervision",
   },
 ];

@@ -10,28 +10,28 @@ import SearchOverlay from "@/components/home/SearchOverlay";
 const slides = [
   {
     id: 1,
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=80",
+    image: "/1.jpeg",
     eyebrow: "DESIGNING SPACES",
     heading: "Inspiring Lives.",
     copy: "Fanoon Consultants is a multidisciplinary design consultancy delivering innovative architectural, interior, and landscape solutions with precision, creativity, and integrity.",
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80",
+    image: "/2.jpeg",
     eyebrow: "INNOVATIVE INTERIORS",
     heading: "Crafting Comfort.",
     copy: "Our interior design experts blend aesthetics with functionality, creating spaces that elevate your everyday living and working experiences.",
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1920&q=80",
+    image: "/3.jpeg",
     eyebrow: "SUSTAINABLE LANDSCAPES",
     heading: "Connecting with Nature.",
     copy: "We design sustainable and breathtaking outdoor environments that seamlessly bridge the gap between built architecture and the natural world.",
   },
   {
     id: 4,
-    image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=80",
+    image: "/4.jpeg",
     eyebrow: "EXPERT SUPERVISION",
     heading: "Building the Future.",
     copy: "Our professional project management and construction supervision ensure that every design is executed flawlessly, on time, and on budget.",
