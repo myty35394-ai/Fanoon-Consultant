@@ -228,7 +228,7 @@ export const servicesData: ServiceDetail[] = [
       "We balance hardscape and softscape elements perfectly.",
     ],
     introImage:
-      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80",
+      "/Landscape.jpeg",
     pillars: [
       { icon: Trees, label: "Softscape" },
       { icon: MapPin, label: "Hardscape" },
@@ -275,7 +275,7 @@ export const servicesData: ServiceDetail[] = [
       "This helps in making informed design decisions and marketing projects effectively.",
     ],
     introImage:
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80",
+      "/3d Visualization Image.jpeg",
     pillars: [
       { icon: Box, label: "Photorealistic" },
       { icon: Lightbulb, label: "Lighting Accurancy" },

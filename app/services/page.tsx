@@ -48,7 +48,7 @@ const services = [
       "Designing outdoor spaces that connect nature and architecture for a sustainable and beautiful environment.",
     icon: <Trees />,
     imageUrl:
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+      "/Landscape.jpeg",
     href: "/services/landscape-design",
   },
   {
@@ -58,7 +58,7 @@ const services = [
       "High-quality 3D renders and animations that help you visualize your project before it is built.",
     icon: <Box />,
     imageUrl:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
+      "/3d Visualization Image.jpeg",
     href: "/services/3d-visualization",
   },
   {
