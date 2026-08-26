@@ -202,6 +202,28 @@ export async function submitStartProjectForm(
     };
   }
 
+  const formatProjectTypeLabel = (type: string | null) => {
+    switch (type) {
+      case "architecture": return "Architecture Design";
+      case "interior": return "Interior Design";
+      case "landscape": return "Landscape Design";
+      case "construction": return "Construction Supervision";
+      case "other": return "Other";
+      default: return type || "Architecture Design";
+    }
+  };
+
+  const formatBudgetLabel = (budget: string | null) => {
+    switch (budget) {
+      case "under-5m": return "Under 5M PKR";
+      case "5m-10m": return "5M - 10M PKR";
+      case "10m-50m": return "10M - 50M PKR";
+      case "above-50m": return "Above 50M PKR";
+      case "undecided": return "To be decided";
+      default: return budget;
+    }
+  };
+
   // ── Send Email Notification (non-blocking / error-safe) ──────
   try {
     await sendInquiryNotificationEmail({
@@ -211,9 +233,9 @@ export async function submitStartProjectForm(
       company,
       location,
       estimatedStartDate,
-      service: "Start A Project Wizard",
-      projectType,
-      budgetRange,
+      service: formatProjectTypeLabel(projectType),
+      projectType: formatProjectTypeLabel(projectType),
+      budgetRange: formatBudgetLabel(budgetRange),
       message,
       attachments: attachmentUrls,
       source: "Start A Project Questionnaire",

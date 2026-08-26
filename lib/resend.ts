@@ -456,11 +456,21 @@ export async function sendInquiryNotificationEmail(data: InquiryEmailData) {
 
   const resendClient = new Resend(apiKey);
 
+  const isProjectQuery = Boolean(
+    data.projectType ||
+    data.budgetRange ||
+    data.estimatedStartDate ||
+    data.source?.toLowerCase().includes("project")
+  );
+  const subjectPrefix = isProjectQuery ? "New Project Query" : "New Client Inquiry";
+  const subjectCategory = data.projectType || data.service || (isProjectQuery ? "Project Brief" : "General Inquiry");
+  const subject = `${subjectPrefix}: ${data.name} - ${subjectCategory}`;
+
   const response = await resendClient.emails.send({
     from: fromEmail,
     to: adminEmail,
     replyTo: data.email,
-    subject: `New Client Inquiry: ${data.name} - ${data.service || data.projectType || "General Inquiry"}`,
+    subject,
     html: htmlContent,
   });
 
