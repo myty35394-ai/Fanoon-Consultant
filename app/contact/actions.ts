@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { inquiries } from "@/db/schema";
 import { v2 as cloudinary } from "cloudinary";
 import { randomUUID } from "crypto";
+import { sendInquiryNotificationEmail } from "@/lib/resend";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -96,6 +97,23 @@ export async function submitContactForm(
     };
   }
 
+  // ── 5. Send Email Notification (non-blocking / error-safe) ────
+  try {
+    await sendInquiryNotificationEmail({
+      name,
+      email,
+      phone,
+      service: subject,
+      projectType,
+      budgetRange,
+      message,
+      attachments: attachmentUrls,
+      source: "Contact Page Form",
+    });
+  } catch (emailErr) {
+    console.error("[INQUIRY_EMAIL_ERROR] Failed to send email notification:", emailErr);
+  }
+
   return {
     status: "success",
     message:
@@ -182,6 +200,26 @@ export async function submitStartProjectForm(
       status: "error",
       message: "Failed to submit your project. Please try again later.",
     };
+  }
+
+  // ── Send Email Notification (non-blocking / error-safe) ──────
+  try {
+    await sendInquiryNotificationEmail({
+      name,
+      email,
+      phone,
+      company,
+      location,
+      estimatedStartDate,
+      service: "Start A Project Wizard",
+      projectType,
+      budgetRange,
+      message,
+      attachments: attachmentUrls,
+      source: "Start A Project Questionnaire",
+    });
+  } catch (emailErr) {
+    console.error("[PROJECT_INQUIRY_EMAIL_ERROR] Failed to send email notification:", emailErr);
   }
 
   return {

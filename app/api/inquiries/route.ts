@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { inquiries } from "@/db/schema";
+import { sendInquiryNotificationEmail } from "@/lib/resend";
 
 export async function POST(req: Request) {
   try {
@@ -22,6 +23,20 @@ export async function POST(req: Request) {
       service: service || null,
       message,
     }).returning();
+
+    // Trigger email notification (non-blocking / error-safe)
+    try {
+      await sendInquiryNotificationEmail({
+        name,
+        email,
+        phone,
+        service: service || "General Inquiry",
+        message,
+        source: "Contact API / Quick Form",
+      });
+    } catch (emailErr) {
+      console.error("[INQUIRY_API_EMAIL_ERROR] Failed to send email notification:", emailErr);
+    }
 
     return NextResponse.json({ success: true, inquiry: newInquiry[0] }, { status: 201 });
   } catch (error) {
