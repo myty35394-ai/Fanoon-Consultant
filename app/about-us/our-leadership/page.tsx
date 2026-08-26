@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2, Building2, Leaf, Lightbulb, Users } from "lucide-react";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { db } from "@/db";
-import { projects } from "@/db/schema";
+import { projects, teamMembers } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 
 export const revalidate = 0;
@@ -56,6 +56,21 @@ const journey = [
 ];
 
 export default async function LeadershipProfilePage() {
+  // Fetch leader photo dynamically from teamMembers DB
+  let leaderImage = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=1200&q=80";
+  try {
+    const leader = await db
+      .select()
+      .from(teamMembers)
+      .orderBy(teamMembers.order)
+      .limit(1);
+    if (leader.length > 0 && leader[0].imageUrl) {
+      leaderImage = leader[0].imageUrl;
+    }
+  } catch (err) {
+    console.error("Failed to fetch leader image:", err);
+  }
+
   // Fetch up to 4 of Arsalan's portfolio projects from DB
   let portfolioItems: { title: string; category: string; image: string; href: string }[] = [];
   try {
@@ -84,7 +99,7 @@ export default async function LeadershipProfilePage() {
         {/* Right side image container — showing the person fully on the right */}
         <div className="absolute top-0 bottom-0 right-0 w-full lg:w-[60%] z-0">
           <Image
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=1200&q=80"
+            src={leaderImage}
             alt="Ar. Arsalan Haider"
             fill
             className="object-cover object-top lg:object-[center_top]"

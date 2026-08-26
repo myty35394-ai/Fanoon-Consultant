@@ -187,7 +187,7 @@ export default function AdminTeamPage() {
 
             {/* Footer hint */}
             <div className="p-4 border-t border-white/5 text-center text-white/25 text-[10px]">
-              {members.length} member{members.length !== 1 ? "s" : ""} · Changes reflect live on the About Us page
+              {members.length} member{members.length !== 1 ? "s" : ""} · The member with <strong className="text-primary/60">Order 1</strong> appears as the hero portrait on the Our Leadership &amp; About Us pages
             </div>
           </div>
         )}

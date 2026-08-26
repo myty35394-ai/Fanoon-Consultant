@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { teamMembers } from "@/db/schema";
 import { eq } from "drizzle-orm";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
@@ -38,6 +41,14 @@ export async function POST(req: Request) {
       })
       .returning();
 
+    // Invalidate public page caches
+    revalidatePath("/about-us");
+    revalidatePath("/about-us/meet-the-team");
+    revalidatePath("/about-us/our-leadership");
+    revalidatePath("/about-us/our-leadership/portfolio");
+    revalidatePath("/portfolio");
+    revalidatePath("/");
+
     return NextResponse.json({ success: true, member: newMember[0] }, { status: 201 });
   } catch (error) {
     console.error("Error creating team member:", error);
@@ -68,6 +79,14 @@ export async function PUT(req: Request) {
       .where(eq(teamMembers.id, id))
       .returning();
 
+    // Invalidate public page caches so picture changes reflect instantly
+    revalidatePath("/about-us");
+    revalidatePath("/about-us/meet-the-team");
+    revalidatePath("/about-us/our-leadership");
+    revalidatePath("/about-us/our-leadership/portfolio");
+    revalidatePath("/portfolio");
+    revalidatePath("/");
+
     return NextResponse.json({ success: true, member: updated[0] });
   } catch (error) {
     console.error("Error updating team member:", error);
@@ -84,6 +103,15 @@ export async function DELETE(req: Request) {
     }
 
     await db.delete(teamMembers).where(eq(teamMembers.id, id));
+
+    // Invalidate public page caches
+    revalidatePath("/about-us");
+    revalidatePath("/about-us/meet-the-team");
+    revalidatePath("/about-us/our-leadership");
+    revalidatePath("/about-us/our-leadership/portfolio");
+    revalidatePath("/portfolio");
+    revalidatePath("/");
+
     return NextResponse.json({ success: true, message: "Team member deleted" });
   } catch (error) {
     console.error("Error deleting team member:", error);

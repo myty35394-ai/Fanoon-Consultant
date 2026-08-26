@@ -14,6 +14,8 @@ import CtaBanner from "@/components/shared/CtaBanner";
 import { db } from "@/db";
 import { teamMembers } from "@/db/schema";
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "About Us | Fanoon Consultants",
   description: "Learn about our mission, vision, values, and the leadership team behind our multidisciplinary design consultancy.",
